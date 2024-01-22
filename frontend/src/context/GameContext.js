@@ -1,7 +1,5 @@
 import { createContext } from "react";
 
-export const GameContext = createContext()
-
 export const GameState = {
     NEW: 0,
     WAITING: 1,
@@ -14,3 +12,8 @@ export const GameState = {
     SHOW_LEADERBOARD: 8,
     SHOW_FINAL_RESULTS: 9,
 }
+
+export const GameContext = createContext({
+    name: '',
+    state: GameState.NEW
+})

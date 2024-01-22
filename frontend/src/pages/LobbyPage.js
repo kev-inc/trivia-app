@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GameContext, GameState } from "../context/GameContext";
 import { socket } from "../socket/socket";
 
@@ -7,13 +7,37 @@ const LobbyPage = () => {
 
   useEffect(() => {
     socket.on('connect', () => console.log('connecting to server'))
+    socket.on('message', value => console.log(value))
+    socket.on('joinedGame', ({username}) => {
+      setGameState({state: GameState.WAITING, name: username})
+      socket.on('gameStarting', () => {
+        setGameState({state: GameState.STARTING_QUIZ, name: username})
+      })
+      socket.on('startingNextQuestion', () => {
+        setGameState({state: GameState.STARTING_NEXT_QUESTION, name: username})
+      })
+      socket.on('showQuestion', () => {
+        setGameState({state: GameState.SHOW_QUESTION, name: username})
+      })
+      socket.on('showAnswers', () => {
+        setGameState({state: GameState.SHOW_ANSWERS, name: username})
+      })
+      socket.on('showResult', () => {
+        setGameState({state: GameState.SHOW_RESULT, name: username})
+      })
+      socket.on('showLeaderboard', () => {
+        setGameState({state: GameState.SHOW_LEADERBOARD, name: username})
+      })
+      socket.on('showFinalResults', () => {
+        setGameState({state: GameState.SHOW_FINAL_RESULTS, name: username})
+      })
+    })
+    
   }, [])
   const joinGame = (e) => {
     e.preventDefault();
-    setGameState({
-      state: GameState.WAITING,
-      name: e.target.name.value
-    })
+    const username = e.target.name.value
+    socket.emit('joinGame', {username})
   };
 
   const welcomeComponent = (
@@ -40,7 +64,7 @@ const LobbyPage = () => {
 
   const startingComponent = (
     <div className='my-8'>
-      Game is starting!
+      Game is starting
     </div>
   )
 
@@ -48,7 +72,8 @@ const LobbyPage = () => {
     switch (gameState.state) {
       case GameState.NEW: return welcomeComponent;
       case GameState.WAITING: return waitingComponent;
-      case GameState.STARTING: return startingComponent;
+      case GameState.STARTING_QUIZ: return startingComponent;
+      default: return <span>{gameState.name} {gameState.state}</span>
     }
   }
   return (
