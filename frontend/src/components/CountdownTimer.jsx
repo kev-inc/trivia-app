@@ -5,9 +5,8 @@ const CountdownTimer = ({duration, type = 'lg', onComplete }) => {
         isPlaying
         duration={duration}
         colors={'#fff'}
-        // colorsTime={[3, 2, 1, 0]}
         trailStrokeWidth={0}
-        strokeWidth={20}
+        strokeWidth={16}
         onComplete={onComplete}
     >
         {({ remainingTime }) => <span className='font-bold text-6xl'>{remainingTime}</span>}

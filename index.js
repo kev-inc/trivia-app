@@ -19,12 +19,16 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 
     socket.on('joinGame', ({username}) => {
-        addNewPlayer(socket.id, username)
-        // players.push({id: socket.id, username: username})
-        // console.log('players', players)
-        socket.emit('joinedGame', {username})
-        const players = getPlayerList()
-        io.emit('screen:updatePlayers', {players})
+        try {
+            addNewPlayer(socket.id, username)
+            // players.push({id: socket.id, username: username})
+            // console.log('players', players)
+            socket.emit('joinedGame', {username})
+            const players = getPlayerList()
+            io.emit('screen:updatePlayers', {players})
+        } catch (e) {
+            socket.emit('joinGameError')
+        }
     })
 
     socket.on('startGame', () => {
