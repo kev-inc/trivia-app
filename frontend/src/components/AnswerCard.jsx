@@ -1,0 +1,29 @@
+const AnswerCard = ({color, translucent, animated, children}) => {
+
+    let className = ''
+    switch(color) {
+        case 'red': className = 'bg-red-500 border-b-red-400'
+            break;
+        case 'blue': className = 'bg-blue-500 border-b-blue-400'
+            break;
+        case 'green': className = 'bg-green-500 border-b-green-400'
+            break;
+        case 'yellow': className = 'bg-yellow-500 border-b-yellow-400'
+            break;
+        default: className = 'bg-white border-b-slate-200'
+            break;
+    }
+    if (translucent) {
+        className += ' opacity-20'
+    }
+    if (animated) {
+        className += ' animate__animated animate__bounceIn'
+    }
+
+    return <div className={`${className} border-b-8 rounded-lg p-4`}>
+        {children}
+    </div>
+    
+}
+
+export default AnswerCard

@@ -1,6 +1,8 @@
 const express = require('express');
 const { createServer } = require('node:http');
 const { Server } = require('socket.io');
+const { addNewPlayer, removePlayer, getPlayerList, addScoreToPlayer, getAllScoresDesc } = require('./data/players');
+const { getQuizResponses, addQuizResponse, getQuizTotalResponses, initialiseQuizResponses } = require('./data/responses');
 
 const app = express();
 const server = createServer(app);
@@ -10,8 +12,6 @@ const io = new Server(server, {
     }
 });
 
-const players = []
-
 app.get('/', (req, res) => {
     res.send('server is running');
 });
@@ -19,43 +19,62 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 
     socket.on('joinGame', ({username}) => {
-        players.push({id: socket.id, username: username})
-        console.log('players', players)
+        addNewPlayer(socket.id, username)
+        // players.push({id: socket.id, username: username})
+        // console.log('players', players)
         socket.emit('joinedGame', {username})
+        const players = getPlayerList()
         io.emit('screen:updatePlayers', {players})
     })
 
     socket.on('startGame', () => {
         io.emit('gameStarting')
+        initialiseQuizResponses(10)
     })
     socket.on('screen:startingNextQuestion', () => {
         io.emit('startingNextQuestion')
     })
-    socket.on('screen:showQuestion', () => {
-        io.emit('showQuestion')
+    socket.on('screen:showQuestion', ({question}) => {
+        io.emit('showQuestion', {question})
     })
     socket.on('screen:showAnswers', () => {
         io.emit('showAnswers')
     })
-    socket.on('screen:showResult', () => {
-        io.emit('showResult')
+    socket.on('screen:showResult', ({question}) => {
+        const responses = getQuizResponses(question)
+        io.emit('showResult', {responses})
     })
     socket.on('screen:showLeaderboard', () => {
-        io.emit('showLeaderboard')
+        const leaderboard = getAllScoresDesc()
+        io.emit('showLeaderboard', {leaderboard})
     })
     socket.on('screen:showFinalResults', () => {
-        io.emit('showFinalResults')
+        const leaderboard = getAllScoresDesc()
+        io.emit('showFinalResults', {leaderboard})
+    })
+
+    socket.on('userAnsweredQuestion', ({questionNo, answer, correct}) => {
+        addQuizResponse(questionNo, answer)
+        const answered = getQuizTotalResponses(questionNo)
+        io.emit('updateAnsweredCount', {answered})
+        if (correct) {
+            addScoreToPlayer(socket.id, getPlayerList().length - answered)
+        }
+        socket.emit('userAnswered')
     })
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'just left')
-        const findIndex = players.findIndex(p => p.id == socket.id)
-        if (findIndex !== -1) {
-            players.splice(findIndex, 1)
-        }
+        removePlayer(socket.id)
+        // const findIndex = players.findIndex(p => p.id == socket.id)
+        // if (findIndex !== -1) {
+        //     players.splice(findIndex, 1)
+        // }
+        const players = getPlayerList()
         io.emit('screen:updatePlayers', {players})
     })
 
+    const players = getPlayerList()
     socket.emit('screen:updatePlayers', {players})
     console.log(socket.id, 'connected');
 });

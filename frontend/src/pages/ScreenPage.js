@@ -12,6 +12,8 @@ import question2Sfx from '../audio/20s-question2.webm'
 import leaderboardSfx from '../audio/leaderboard.mp3'
 import questionTimesUpSfx from '../audio/questionTimesUp.mp3'
 import ResultsChart from "../components/ResultsChart";
+import AnswerCard from "../components/AnswerCard";
+import WhiteCard from "../components/WhiteCard";
 
 const ScreenPage = () => {
 
@@ -23,12 +25,13 @@ const ScreenPage = () => {
 
     const [players, setPlayers] = useState([])
     const [question, setQuestion] = useState(0)
+    const [responses, setResponses] = useState()
+    const [leaderboard, setLeaderboard] = useState()
+    const [answeredCount, setAnsweredCount] = useState()
     const { gameState, setGameState } = useContext(GameContext)
 
     useEffect(() => {
         socket.on('connect', () => console.log('connecting to server'))
-        socket.on('connect_error', err => console.log(err))
-        socket.on('connect_failed', err => console.log(err))
         socket.on('screen:updatePlayers', ({ players }) => {
             console.log(players)
             setPlayers(players)
@@ -41,6 +44,7 @@ const ScreenPage = () => {
         })
         socket.on('startingNextQuestion', () => {
             setGameState({ state: GameState.STARTING_NEXT_QUESTION })
+            setAnsweredCount(0)
         })
         socket.on('showQuestion', () => {
             setGameState({ state: GameState.SHOW_QUESTION })
@@ -48,14 +52,20 @@ const ScreenPage = () => {
         socket.on('showAnswers', () => {
             setGameState({ state: GameState.SHOW_ANSWERS })
         })
-        socket.on('showResult', () => {
+        socket.on('showResult', ({responses: resp}) => {
             setGameState({ state: GameState.SHOW_RESULT })
+            setResponses(resp)
         })
-        socket.on('showLeaderboard', () => {
+        socket.on('showLeaderboard', ({leaderboard: lb}) => {
             setGameState({ state: GameState.SHOW_LEADERBOARD })
+            setLeaderboard(lb)
         })
-        socket.on('showFinalResults', () => {
+        socket.on('showFinalResults', ({leaderboard: lb}) => {
             setGameState({ state: GameState.SHOW_FINAL_RESULTS })
+            setLeaderboard(lb)
+        })
+        socket.on('updateAnsweredCount', ({answered}) => {
+            setAnsweredCount(answered)
         })
     }, [])
 
@@ -68,13 +78,13 @@ const ScreenPage = () => {
                 socket.emit('screen:startingNextQuestion')
                 break;
             case GameState.STARTING_NEXT_QUESTION:
-                socket.emit('screen:showQuestion')
+                socket.emit('screen:showQuestion', {question})
                 break;
             case GameState.SHOW_QUESTION:
                 socket.emit('screen:showAnswers')
                 break;
             case GameState.SHOW_ANSWERS:
-                socket.emit('screen:showResult')
+                socket.emit('screen:showResult', {question})
                 break;
             case GameState.SHOW_RESULT:
                 socket.emit('screen:showLeaderboard')
@@ -97,13 +107,15 @@ const ScreenPage = () => {
                 return (
                     <div key={0}>
                         <div className='text-2xl p-4'>Waiting for players... ({players.length})</div>
-                        {players.map((p, index) => <span key={index} className='px-4 py-2 bg-sky-500 m-2 rounded text-2xl font-semibold animate__animated animate__bounceIn'>{p.username}</span>)}
+                        {players.map((p, index) => <span key={index} className='px-4 py-2 bg-sky-500 m-2 rounded text-2xl font-semibold animate__animated animate__bounceIn'>{p}</span>)}
                     </div>
                 )
-            case GameState.STARTING_QUIZ: return <div key={1} className='flex justify-center items-center h-full text-4xl animate__animated animate__zoomIn'>
-                <div className='bg-white text-black font-bold w-full py-8 m-8'>
-                    Kevin and Jewel's Wedding Trivia!
-                </div>
+            case GameState.STARTING_QUIZ: return <div key={1} className='flex justify-center items-center h-full text-4xl m-8 animate__animated animate__zoomIn'>
+                <WhiteCard>
+                    <div className='py-8'>
+                        Kevin and Jewel's Wedding Trivia!
+                    </div>
+                </WhiteCard>
             </div>
             case GameState.STARTING_NEXT_QUESTION:
                 // playQuestion2()
@@ -117,14 +129,22 @@ const ScreenPage = () => {
                 </div>
             case GameState.SHOW_QUESTION: 
                 return <div key={3} className='flex flex-col justify-center items-center h-full text-4xl '>
-                    <div className='flex-1 w-full px-8'>
-                        <div className='bg-white text-black font-bold w-full py-8 animate__animated animate__zoomIn'>{questions[question]['question']}</div>
+                    <div className='flex-1 w-full px-8 animate__animated animate__zoomIn'>
+                        <WhiteCard>
+                            <div className='py-8'>
+                                {questions[question]['question']}
+                            </div>
+                        </WhiteCard>
                     </div>
                     <CountdownTimer onComplete={transitionToNextState} duration={3}/>
                 </div>
             case GameState.SHOW_ANSWERS: return <div key={3} className='flex flex-col justify-center items-center h-full text-4xl '>
                     <div className='w-full px-8'>
-                        <div className='bg-white text-black font-bold w-full py-8'>{questions[question]['question']}</div>
+                        <WhiteCard>
+                            <div className='py-8'>
+                                {questions[question]['question']}
+                            </div>
+                        </WhiteCard>
                     </div>
                     <div className='flex flex-1 w-full p-8'>
                         <div>
@@ -132,69 +152,86 @@ const ScreenPage = () => {
                         </div>
                         <div className='flex-1'></div>
                         <div className='text-center'>
-                            <span className='text-4xl font-bold'>0</span><br />
+                            <span className='text-4xl font-bold'>{answeredCount}</span><br />
                             <span className='text-lg font-semibold'>Answered</span>
                         </div>
                     </div>
                     <div className=' w-full grid grid-cols-2 gap-4 text-3xl p-8 font-semibold text-left'>
-                        <div className='bg-red-500 p-4 animate__animated animate__bounceIn'>
-                            <span className='mr-2'>▲</span>
+                        <AnswerCard color='red' animated>
+                            <span className='mr-2'>A.</span>
                             {questions[question]['answers'][0]}
-                        </div>
-                        <div className='bg-blue-500 p-4 animate__animated animate__bounceIn'>
-                            <span className='mr-2'>◆</span>
+                        </AnswerCard>
+                        <AnswerCard color='blue' animated>
+                            <span className='mr-2'>B.</span>
                             {questions[question]['answers'][1]}
-                        </div>
-                        <div className='bg-green-500 p-4 animate__animated animate__bounceIn'>
-                            <span className='mr-2'>●</span>
+                        </AnswerCard>
+                        <AnswerCard color='green' animated>
+                            <span className='mr-2'>C.</span>
                             {questions[question]['answers'][2]}
-                        </div>
-                        <div className='bg-yellow-500 p-4 animate__animated animate__bounceIn'>
-                            <span className='mr-2'>■</span>
+                        </AnswerCard>
+                        <AnswerCard color='yellow' animated>
+                            <span className='mr-2'>D.</span>
                             {questions[question]['answers'][3]}
-                        </div>
+                        </AnswerCard>
                     </div>
                 </div>
             
             case GameState.SHOW_RESULT: 
+                const labels = ['A', 'B', 'C', 'D']
+                const correctAns = questions[question]['answer']
+                labels[correctAns] += '✓'
                 // stopQuestion2()
                 // playQuestionTimesUp()
                 return <div key={4} className='flex flex-col justify-center items-center h-full text-4xl '>
                     <div className='w-full px-8'>
-                        <div className='bg-white text-black font-bold w-full py-8'>{questions[question]['question']}</div>
+                        <WhiteCard>
+                            <div className='py-8'>
+                                {questions[question]['question']}
+                            </div>
+                        </WhiteCard>
                     </div>
                     <div className='flex flex-1 w-full p-8'>
                         <div className='flex-1'>
-                            <ResultsChart />
+                            <ResultsChart labels={labels} responses={responses}/>
                         </div>
                     </div>
                     <div className=' w-full grid grid-cols-2 gap-4 text-3xl p-8 font-semibold text-left'>
-                        <div className={`bg-red-500 p-4 ${questions[question]['answer'] === 0 ? '' : 'opacity-20'}`}>
-                            <span className='mr-2'>▲</span>
+                        <AnswerCard color='red' translucent={questions[question]['answer'] !== 0}>
+                            <span className='mr-2'>A.</span>
                             {questions[question]['answers'][0]}
-                        </div>
-                        <div className={`bg-blue-500 p-4 ${questions[question]['answer'] === 1 ? '' : 'opacity-20'}`}>
-                            <span className='mr-2'>◆</span>
+                        </AnswerCard>
+                        <AnswerCard color='blue' translucent={questions[question]['answer'] !== 1}>
+                            <span className='mr-2'>B.</span>
                             {questions[question]['answers'][1]}
-                        </div>
-                        <div className={`bg-green-500 p-4 ${questions[question]['answer'] === 2 ? '' : 'opacity-20'}`}>
-                            <span className='mr-2'>●</span>
+                        </AnswerCard>
+                        <AnswerCard color='green' translucent={questions[question]['answer'] !== 2}>
+                            <span className='mr-2'>C.</span>
                             {questions[question]['answers'][2]}
-                        </div>
-                        <div className={`bg-yellow-500 p-4 ${questions[question]['answer'] === 3 ? '' : 'opacity-20'}`}>
-                            <span className='mr-2'>■</span>
+                        </AnswerCard>
+                        <AnswerCard color='yellow' translucent={questions[question]['answer'] !== 3}>
+                            <span className='mr-2'>D.</span>
                             {questions[question]['answers'][3]}
-                        </div>
+                        </AnswerCard>
+                        
                     </div>
                 </div>
             case GameState.SHOW_LEADERBOARD: 
                 // playLeaderboard()
                 return <div className='flex justify-center items-center h-full'>
                     <div className=' w-1/2 mx-auto flex flex-col gap-y-4'>
-                        {['player1', 'player2', 'player3', 'player4', 'player5'].map((name, index) => (
-                            <div key={index} className='bg-white text-black text-3xl font-semibold px-4 py-2'>
-                                {name}
-                            </div>
+                        {[
+                            {name: 'player1', score: 23},
+                            {name: 'player2', score: 16},
+                            {name: 'player3', score: 14},
+                            {name: 'player4', score: 13},
+                            {name: 'player5', score: 5},
+                        ].map((player, index) => (
+                            <WhiteCard key={index}>
+                                <div className='flex justify-between items-center px-8 py-2'>
+                                    <span className='text-3xl'>{player.name}</span>
+                                    <span className='text-4xl'>{player.score}</span>
+                                </div>
+                            </WhiteCard>
                         ))}
                     </div>
                 </div>

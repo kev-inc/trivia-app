@@ -22,7 +22,6 @@ function App() {
   })
   return <GameContext.Provider value={{ gameState, setGameState }}>
     <RouterProvider router={router} />
-    <DebugButtons />
   </GameContext.Provider>
 }
 

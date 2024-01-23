@@ -8,6 +8,10 @@ services:
       - ./:/opt
     tty: true
     stdin_open: true
+  tunnel-server:
+    container_name: tunnel-server
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://server:3001
   # frontend:
   #   image: node:current-alpine
   #   container_name: "frontend"
@@ -15,11 +19,7 @@ services:
   #   volumes:
   #     - ./frontend:/opt
   #   command: "npm start"
-  server-tunnel:
-    container_name: server-tunnel
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate --url http://server:3001
-  # frontend-tunnel:
-  #   container_name: frontend-tunnel
+  # tunnel-frontend:
+  #   container_name: tunnel-frontend
   #   image: cloudflare/cloudflared:latest
   #   command: tunnel --no-autoupdate --url http://frontend:3000
