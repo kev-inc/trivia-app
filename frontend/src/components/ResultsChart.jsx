@@ -39,6 +39,7 @@ const ResultsChart = ({ labels, responses }) => {
         },
         scales: {
             x: {
+                display: false,
                 backgroundColor: '#fff',
                 ticks: {
                     color: ['rgb(239 68 68)', 'rgb(59 130 246)', 'rgb(34 197 94)', 'rgb(234 179 8)'],
