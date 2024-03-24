@@ -12,14 +12,14 @@ services:
     container_name: tunnel-server
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate --url http://server:3001
-  # frontend:
-  #   image: node:current-alpine
-  #   container_name: "frontend"
-  #   working_dir: '/opt'
-  #   volumes:
-  #     - ./frontend:/opt
-  #   command: "npm start"
-  # tunnel-frontend:
-  #   container_name: tunnel-frontend
-  #   image: cloudflare/cloudflared:latest
-  #   command: tunnel --no-autoupdate --url http://frontend:3000
+  frontend:
+    image: node:current-alpine
+    container_name: "frontend"
+    working_dir: '/opt'
+    volumes:
+      - ./frontend:/opt
+    command: "npm start"
+  tunnel-frontend:
+    container_name: tunnel-frontend
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://frontend:3000
