@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useMemo, useState } from "react"
 import { socket } from "../socket/socket"
 import useSound from 'use-sound';
 import { GameContext, GameState } from "../context/GameContext"
 import { questions } from "../data/questions"
-import background from '../images/bg-screen.jpg'
+import background from '../images/bg-screen1.JPG'
 import CountdownTimer from "../components/CountdownTimer"
 
 import lobbySfx from '../audio/lobby.webm'
@@ -22,11 +22,11 @@ import LeaderboardScreen from "../components/screen/LeaderboardScreen";
 
 const ScreenPage = () => {
 
-    const [playQuestionTimesUp] = useSound(questionTimesUpSfx)
-    const [playLobby] = useSound(lobbySfx)
+    const [playQuestionTimesUp, {sound: soundQuestionTimesUp}] = useSound(questionTimesUpSfx)
+    const [playLobby, {stop: stopLobby}] = useSound(lobbySfx)
     const [playQuestion1, {stop: stopQuestion1}] = useSound(question1Sfx)
-    const [playQuestion2, {stop: stopQuestion2}] = useSound(question2Sfx)
-    const [playLeaderboard] = useSound(leaderboardSfx)
+    const [playQuestion2, {sound: soundQ2, stop: stopQ2}] = useSound(question2Sfx)
+    const [playLeaderboard, {sound: soundLeaderboard}] = useSound(leaderboardSfx)
 
     const [players, setPlayers] = useState([])
     const [question, setQuestion] = useState(0)
@@ -36,13 +36,10 @@ const ScreenPage = () => {
     const { gameState, setGameState } = useContext(GameContext)
 
     useEffect(() => {
-        socket.on('connect', () => console.log('connecting to server'))
+        socket.on('connect', () => console.log('connected to server'))
         socket.on('screen:updatePlayers', ({ players }) => {
             console.log(players)
             setPlayers(players)
-        })
-        socket.on('gameStarting', () => {
-            setGameState({ state: GameState.STARTING_QUIZ })
         })
         socket.on('gameStarting', () => {
             setGameState({ state: GameState.STARTING_QUIZ })
@@ -63,6 +60,7 @@ const ScreenPage = () => {
         })
         socket.on('showLeaderboard', ({leaderboard: lb}) => {
             setGameState({ state: GameState.SHOW_LEADERBOARD })
+            console.log(lb)
             setLeaderboard(lb)
         })
         socket.on('showFinalResults', ({leaderboard: lb}) => {
@@ -92,7 +90,7 @@ const ScreenPage = () => {
                 socket.emit('screen:showResult', {question})
                 break;
             case GameState.SHOW_RESULT:
-                socket.emit('screen:showLeaderboard')
+                socket.emit('screen:showLeaderboard', {question})
                 break;
             case GameState.SHOW_LEADERBOARD:
                 if (question < questions.length - 1) {
@@ -105,15 +103,38 @@ const ScreenPage = () => {
         }
     }
 
+    const playAudio = useMemo(() => {
+        switch (gameState.state) {
+            case GameState.STARTING_NEXT_QUESTION:
+                if (!soundQ2.playing()) {
+                    playQuestion2()
+                }
+                return 
+            case GameState.SHOW_RESULT:
+                if (soundQ2.playing()) {
+                    stopQ2()
+                }
+                if (!soundQuestionTimesUp.playing()) {
+                    playQuestionTimesUp()
+                }
+                return
+            case GameState.SHOW_LEADERBOARD:
+                if (!soundLeaderboard.playing()) {
+                    playLeaderboard()
+                }
+                return
+        }
+        return
+    }, [gameState])
+
+
     const renderScreen = () => {
         switch (gameState.state) {
             case GameState.NEW: 
-                // playLobby()
                 return <WaitingScreen players={players}/>
             case GameState.STARTING_QUIZ: 
                 return <StartingQuizScreen />
             case GameState.STARTING_NEXT_QUESTION:
-                // playQuestion2()
                 return <StartingQuestionScreen transitionToNextState={transitionToNextState} />
             case GameState.SHOW_QUESTION: 
             case GameState.SHOW_ANSWERS:
@@ -133,8 +154,7 @@ const ScreenPage = () => {
                 />
                 
             case GameState.SHOW_LEADERBOARD: 
-                // playLeaderboard()
-                return <LeaderboardScreen />
+                return <LeaderboardScreen leaderboard={leaderboard}/>
             case GameState.SHOW_FINAL_RESULTS: return <div>Final score</div>
         }
     }
@@ -151,6 +171,7 @@ const ScreenPage = () => {
                     </div>
                     <div className='text-center flex-1'>
                         {renderScreen()}
+                        {playAudio}
                     </div>
                 </div>
                 <div className='flex flex-row-reverse'>

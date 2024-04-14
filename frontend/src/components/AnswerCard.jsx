@@ -1,4 +1,4 @@
-const AnswerCard = ({color, translucent, animated, children}) => {
+const AnswerCard = ({onclick, color, translucent, animated, children}) => {
 
     let className = ''
     switch(color) {
@@ -20,7 +20,7 @@ const AnswerCard = ({color, translucent, animated, children}) => {
         className += ' animate__animated animate__bounceIn'
     }
 
-    return <div className={`${className} border-b-8 rounded-lg p-4`}>
+    return <div className={`${className} border-b-8 rounded-lg p-4`} onClick={onclick}>
         {children}
     </div>
     
