@@ -2,7 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { GameContext, GameState } from "../context/GameContext";
 import { questions } from "../data/questions"
 import { socket } from "../socket/socket";
-import background from '../images/bg-screen.jpg'
+import background from '../images/bg-screen1.JPG'
+import AnswerCard from "../components/AnswerCard";
 
 const LobbyPage = () => {
   const { gameState, setGameState } = useContext(GameContext)
@@ -13,6 +14,7 @@ const LobbyPage = () => {
     socket.on('message', value => console.log(value))
     socket.on('joinedGame', ({ username }) => {
       setGameState({ state: GameState.WAITING, name: username })
+
       socket.on('gameStarting', () => {
         setGameState({ state: GameState.STARTING_QUIZ, name: username })
       })
@@ -32,8 +34,12 @@ const LobbyPage = () => {
       socket.on('showResult', () => {
         setGameState({ state: GameState.SHOW_RESULT, name: username })
       })
-      socket.on('showLeaderboard', () => {
-        setGameState({ state: GameState.SHOW_LEADERBOARD, name: username })
+      socket.on('showLeaderboard', ({leaderboard: lb}) => {
+        const myPosition = lb['full'].findIndex(l => l.player_id == socket.id)
+        console.log(lb, socket.id, myPosition)
+        if (myPosition => 0) {
+          setGameState({ state: GameState.SHOW_LEADERBOARD, name: username, position: myPosition, full: lb['full'] })
+        }
       })
       socket.on('showFinalResults', () => {
         setGameState({ state: GameState.SHOW_FINAL_RESULTS, name: username })
@@ -63,6 +69,12 @@ const LobbyPage = () => {
         Join!
       </button>
     </form>
+  )
+
+  const nameComponent = (
+    <div className='my-8 font-playfair'>
+      <div className='text-xl'>Welcome, <span className='font-bold'>{gameState.name}</span>!</div>
+    </div>
   )
 
   const waitingComponent = (
@@ -95,23 +107,23 @@ const LobbyPage = () => {
   const answersComponent = (
     <div>
       {questionComponent}
-      <div className=' w-full grid grid-cols-1 text-white gap-4 text-3xl p-8 font-semibold text-left'>
-        <button className='bg-red-500 border-b-8 border-red-400 rounded-lg p-4 animate__animated animate__bounceIn' onClick={() => submitAnswer(0)}>
-          <span className='mr-2'>A.</span>
-          {questions[questionNo]['answers'][0]}
-        </button>
-        <button className='bg-blue-500 border-b-8 border-blue-400 rounded-lg p-4 animate__animated animate__bounceIn' onClick={() => submitAnswer(1)}>
-          <span className='mr-2'>B.</span>
-          {questions[questionNo]['answers'][1]}
-        </button>
-        <button className='bg-green-500 border-b-8 border-green-400 rounded-lg p-4 animate__animated animate__bounceIn' onClick={() => submitAnswer(2)}>
-          <span className='mr-2'>C.</span>
-          {questions[questionNo]['answers'][2]}
-        </button>
-        <button className='bg-yellow-500 border-b-8 border-yellow-400 rounded-lg p-4 animate__animated animate__bounceIn' onClick={() => submitAnswer(3)}>
-          <span className='mr-2'>D.</span>
-          {questions[questionNo]['answers'][3]}
-        </button>
+      <div className=' w-full grid grid-cols-1 text-white gap-4 text-3xl p-8 font-semibold'>
+        <AnswerCard onclick={() => submitAnswer(0)} color='red' animated centered>
+            <span className='mr-2'>A.</span>
+            {questions[questionNo]['answers'][0]}
+        </AnswerCard>
+        <AnswerCard onclick={() => submitAnswer(1)} color='blue' animated centered>
+            <span className='mr-2'>B.</span>
+            {questions[questionNo]['answers'][1]}
+        </AnswerCard>
+        <AnswerCard onclick={() => submitAnswer(2)} color='green' animated centered>
+            <span className='mr-2'>C.</span>
+            {questions[questionNo]['answers'][2]}
+        </AnswerCard>
+        <AnswerCard onclick={() => submitAnswer(3)} color='yellow' animated centered>
+            <span className='mr-2'>D.</span>
+            {questions[questionNo]['answers'][3]}
+        </AnswerCard>
       </div>
     </div>
   )
@@ -119,6 +131,78 @@ const LobbyPage = () => {
   const answerSubmittedComponent = (
     <div className='my-8 font-playfair text-xl'>
       <div className='w-5/6 mx-auto font-bold'>You&apos;ve submitted your answer! All the best!</div>
+    </div>
+  )
+
+  const showCorrectAnswerComponent = (
+    <div className='my-8 '>
+      <div className='w-5/6 mx-auto font-playfair text-xl font-bold'>The answer is...</div>
+      <div className='text-3xl p-8 font-semibold'>
+        {
+          questions[questionNo]['answer'] == 0 && (
+            <AnswerCard color='red' animated centered>
+                <span className='mr-2'>A.</span>
+                {questions[questionNo]['answers'][0]}
+            </AnswerCard>
+          )
+        }
+        {
+          questions[questionNo]['answer'] == 1 && (
+            <AnswerCard color='blue' animated centered>
+                <span className='mr-2'>B.</span>
+                {questions[questionNo]['answers'][1]}
+            </AnswerCard>
+          )
+        }
+        {
+          questions[questionNo]['answer'] == 2 && (
+            <AnswerCard color='green' animated centered>
+                <span className='mr-2'>C.</span>
+                {questions[questionNo]['answers'][2]}
+            </AnswerCard>
+          )
+        }
+        {
+          questions[questionNo]['answer'] == 3 && (
+            <AnswerCard color='yellow' animated centered>
+                <span className='mr-2'>D.</span>
+                {questions[questionNo]['answers'][3]}
+            </AnswerCard>
+          )
+        }
+      </div>
+    </div>
+  )
+
+  const showCurrentPositionComponent = gameState.full && (
+    <div className='my-8 font-playfair text-xl'>
+      <div className='w-5/6 mx-auto font-bold'>You are currently {gameState.position + 1}!</div>
+
+      <div className='flex flex-col justify-center items-center h-full mt-3'>
+        <div className=' w-1/2 h-full flex flex-col gap-y-4'>
+          { (gameState.position - 1) >= 0 &&
+            <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
+              <span className='text-3xl font-playfair'>#{gameState.position}</span>
+              <span className='text-3xl font-playfair'>{gameState.full[gameState.position-1].name}</span>
+              <span className='text-4xl font-playfair'>{gameState.full[gameState.position-1].score}</span>
+            </div>
+          }
+          {
+            <div className='h-full flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
+              <span className='text-3xl font-playfair'>#{gameState.position+1}</span>
+              <span className='text-3xl font-playfair'>{gameState.full[gameState.position].name}</span>
+              <span className='text-4xl font-playfair'>{gameState.full[gameState.position].score}</span>
+            </div>
+          }
+          { (gameState.position + 1) < gameState.full.length &&
+            <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
+              <span className='text-3xl font-playfair'>#{gameState.position+2}</span>
+              <span className='text-3xl font-playfair'>{gameState.full[gameState.position+1].name}</span>
+              <span className='text-4xl font-playfair'>{gameState.full[gameState.position+1].score}</span>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   )
 
@@ -136,6 +220,8 @@ const LobbyPage = () => {
       case GameState.SHOW_QUESTION: return questionComponent;
       case GameState.SHOW_ANSWERS: return answersComponent;
       case GameState.ANSWERED: return answerSubmittedComponent;
+      case GameState.SHOW_RESULT: return showCorrectAnswerComponent;
+      case GameState.SHOW_LEADERBOARD: return showCurrentPositionComponent;
 
       default: return <span>{gameState.name} {gameState.state}</span>
     }
@@ -151,7 +237,7 @@ const LobbyPage = () => {
             <div className='text-xs tracking-wider font-playfair'>28 July 2024</div>
           </div>
           <div className='text-center flex-1'>
-              {renderComponent()}
+            {renderComponent()}
           </div>
         </div>
       </div>

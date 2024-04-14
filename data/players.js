@@ -1,49 +1,21 @@
-const players = new Map();
-const duplicateName = new Map();
-
-const initialisePlayers = () => {
-    players.clear()
-    duplicateName.clear()
-}
+const { db } = require("./db");
 
 const addNewPlayer = (id, name) => {
-    if (duplicateName.has(name)) {
-        throw new Error('duplicate name')
-    }
-    players.set(id, {
-        name: name,
-        score: 0
-    })
-    duplicateName.set(name, id)
+    const info = db.prepare('INSERT INTO players (id, name, active) VALUES (?,?,?)').run(id, name, 1)
 }
 
 const removePlayer = id => {
-    const name = players.get(id)
-    players.delete(id)
-    duplicateName.delete(name)
+    const info = db.prepare('UPDATE players SET active = 0 WHERE id = ?').run(id)
 }
 
 const getPlayerList = () => {
-    return [...players.values()].map(p => p.name)
+    const rows = db.prepare('SELECT * FROM players WHERE active = 1').all()
+    return rows
 }
 
-const addScoreToPlayer = (id, toAdd) => {
-    const p = players.get(id)
-    p.score += toAdd
-    players.set(id, p)
-}
-
-const getAllScoresDesc = () => {
-    return [...players.values()].sort((p1, p2) => {
-        return p2.score - p1.score
-    })
-}
 
 module.exports = {
-    initialisePlayers,
     addNewPlayer,
     removePlayer,
     getPlayerList,
-    addScoreToPlayer,
-    getAllScoresDesc,
 }

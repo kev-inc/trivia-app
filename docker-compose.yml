@@ -2,24 +2,29 @@ version: "3"
 services:
   server:
     image: node:current-alpine
+    network_mode: host
     container_name: "server"
     working_dir: '/opt'
     volumes:
       - ./:/opt
-    tty: true
-    stdin_open: true
-  tunnel-server:
-    container_name: tunnel-server
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate --url http://server:3001
+    # tty: true
+    # stdin_open: true
+    command: "npm start"
+  # tunnel-server:
+  #   container_name: tunnel-server
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --no-autoupdate --url http://server:3001
   frontend:
     image: node:current-alpine
+    network_mode: host
     container_name: "frontend"
     working_dir: '/opt'
     volumes:
       - ./frontend:/opt
+    # tty: true
+    # stdin_open: true
     command: "npm start"
-  tunnel-frontend:
-    container_name: tunnel-frontend
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate --url http://frontend:3000
+  # tunnel-frontend:
+  #   container_name: tunnel-frontend
+  #   image: cloudflare/cloudflared:latest
+  #   command: tunnel --no-autoupdate --url http://frontend:3000

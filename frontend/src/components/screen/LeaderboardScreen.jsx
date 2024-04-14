@@ -1,20 +1,43 @@
-const LeaderboardScreen = () => (
-    <div className='flex justify-center items-center h-full'>
-        <div className=' w-1/2 mx-auto flex flex-col gap-y-4'>
-            {[
-                {name: 'apple', score: 23},
-                {name: 'banana', score: 16},
-                {name: 'coconut', score: 14},
-                {name: 'durian', score: 13},
-                {name: 'emily', score: 5},
-            ].map((player, index) => (
-                    <div key={index} className='flex justify-between items-center px-8 py-2 border-white rounded border-4'>
-                        <span className='text-3xl font-playfair'>{player.name}</span>
-                        <span className='text-4xl'>{player.score}</span>
-                    </div>
-            ))}
+import { useEffect, useState } from "react"
+import { Flipper, Flipped } from 'react-flip-toolkit'
+
+const LeaderboardScreen = ({leaderboard}) => {
+
+    const [order, setOrder] = useState(leaderboard['prev'])
+
+    useEffect(() => {
+        setTimeout(handleReorder, 500)
+    }, [order])
+    useEffect(() => {
+        console.log(leaderboard)
+    }, [])
+
+    const handleReorder = () => {
+        setOrder(leaderboard['new'])
+    }
+    return (
+        <div className='flex flex-col justify-center items-center h-full'>
+
+            <div className='text-center tracking-wider font-playfair mb-3'>
+                <span className='text-4xl font-bold'>Top 5 Leaderboard</span><br />
+            </div>
+            
+            <div className=' w-1/2 mx-auto flex flex-col gap-y-4'>
+                <Flipper flipKey={order.map(o => o.player_id).join('')} spring={{}}>
+                    {order.map((player, index) => (
+                        <Flipped key={player.player_id} flipId={player.player_id}>
+                            <div className='flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
+                                <span className='text-3xl font-playfair'>#{index+1}</span>
+                                <span className='text-3xl font-playfair'>{player.name}</span>
+                                <span className='text-4xl font-playfair animate__animated animate__headShake '>{player.score}</span>
+                            </div>
+                        </Flipped>
+                    ))}
+                </Flipper>
+            </div>
         </div>
-    </div>
-)
+    )
+    
+}
 
 export default LeaderboardScreen

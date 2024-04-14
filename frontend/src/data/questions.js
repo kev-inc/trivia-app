@@ -5,8 +5,18 @@ export const questions = [
         answer: 1
     },
     {
-        question: 'What was the first thing Kevin bought for Jewel?',
-        answers: ['Milo', 'Starbucks', '100 Plus', 'Mineral Water'],
+        question: 'When did Kevin propose to Jewel?',
+        answers: ['11 Nov 2023', '25 Dec 2023', '1 Jan 2024', '2 Feb 2024'],
+        answer: 1
+    },
+    {
+        question: 'What is Kevin & Jewel love language?',
+        answers: ['Quality time', 'Words of affirmation', 'Acts of service', 'All of the above'],
+        answer: 0
+    },
+    {
+        question: 'Where did Kevin & Jewel first go overseas together?',
+        answers: ['Japan', 'Korea', 'London', 'Paris'],
         answer: 0
     },
 ]
