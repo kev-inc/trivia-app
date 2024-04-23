@@ -1,0 +1,14 @@
+version: "3"
+services:
+  server:
+    image: node:current-alpine
+    container_name: "server"
+    working_dir: '/opt'
+    volumes:
+      - ./:/opt
+    command: "npm start"
+  tunnel-server:
+    container_name: tunnel-server
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --url http://server:3001
+  
