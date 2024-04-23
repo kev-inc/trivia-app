@@ -33,7 +33,6 @@ const resetGamestate = () => {
 }
 
 const handleTransitionToNextState = () => {
-    console.log('Transitioning from ', gamestate.state)
     switch(gamestate.state) {
         case GameState.NEW:
             gamestate.state = GameState.STARTING_QUIZ
@@ -72,14 +71,15 @@ const handleTransitionToNextState = () => {
             }
             break
         case GameState.SHOW_LEADERBOARD:
-            gamestate.state = GameState.STARTING_NEXT_QUESTION
-            gamestate.questionNumber = gamestate.questionNumber + 1
+            if (gamestate.questionNumber < questionList.length - 1) {
+                gamestate.state = GameState.STARTING_NEXT_QUESTION
+                gamestate.questionNumber = gamestate.questionNumber + 1
+            }
             break
         case GameState.SHOW_FINAL_RESULTS:
             gamestate.state = GameState.SHOW_LEADERBOARD
             break
     }
-    console.log('To ', gamestate.state)
 }
 
 module.exports = {
