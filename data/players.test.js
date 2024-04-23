@@ -31,12 +31,13 @@ describe('players test', () => {
         expect(getPlayerList()).toEqual(want)
     })
     
-    // test('test duplicate player', () => {
-    //     const t = () => {
-    //         addNewPlayer(2, 'testplayer1')
-    //     };
-    //     expect(t).toThrow("duplicate name")
-    // })
+    test('test duplicate player', () => {
+        const t = () => {
+            addNewPlayer("1", 'testplayer1')
+            addNewPlayer("2", 'testplayer1')
+        };
+        expect(t).toThrow("duplicate name")
+    })
     
     test('test remove player', async () => {
         addNewPlayer("1", "testplayer1")

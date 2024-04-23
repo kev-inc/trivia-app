@@ -25,6 +25,7 @@ const getPlayerScore = (playerId, questionNumber) => {
 
 const getQuestionResponses = (questionNumber) => {
     const data = db.prepare('SELECT answer_selected, count(1) AS count FROM player_responses WHERE question_number = ? GROUP BY answer_selected').all(questionNumber)
+    console.log(data)
     return data
 }
 

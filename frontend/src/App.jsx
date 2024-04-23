@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import LobbyPage from "./pages/LobbyPage";
+import PlayerPage from "./pages/PlayerPage";
 import { useEffect, useState } from "react";
 import { GameContext, GameState } from "./context/GameContext";
 import DebugButtons from "./components/DebugButtons";
@@ -8,7 +8,7 @@ import ScreenPage from "./pages/ScreenPage";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <LobbyPage />,
+    element: <PlayerPage />,
   }, {
     path: "/screen",
     element: <ScreenPage />,
@@ -16,11 +16,6 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-
-  const [gameState, setGameState] = useState({
-    name: '',
-    state: GameState.NEW
-  })
   useEffect(() => {
     function handleBeforeUnload(e) {
       e.preventDefault()
@@ -31,12 +26,7 @@ function App() {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [])
-  useEffect(() => {
-    console.log(gameState)
-  }, [gameState])
-  return <GameContext.Provider value={{ gameState, setGameState }}>
-    <RouterProvider router={router} />
-  </GameContext.Provider>
+  return <RouterProvider router={router} />
 }
 
 export default App;
