@@ -19,6 +19,7 @@ import StartingQuizScreen from "../components/screen/StartingQuizScreen";
 import StartingQuestionScreen from "../components/screen/StartingQuestionScreen";
 import QuestionScreen from "../components/screen/QuestionScreen";
 import LeaderboardScreen from "../components/screen/LeaderboardScreen";
+import FinalLeaderboardScreen from "../components/screen/FinalLeaderboardScreen";
 
 const ScreenPage = () => {
 
@@ -28,110 +29,85 @@ const ScreenPage = () => {
     const [playQuestion2, {sound: soundQ2, stop: stopQ2}] = useSound(question2Sfx)
     const [playLeaderboard, {sound: soundLeaderboard}] = useSound(leaderboardSfx)
 
-    const [players, setPlayers] = useState([])
-    const [question, setQuestion] = useState(0)
-    const [responses, setResponses] = useState()
-    const [leaderboard, setLeaderboard] = useState()
-    const [answeredCount, setAnsweredCount] = useState()
-    const { gameState, setGameState } = useContext(GameContext)
+    const [gameState, setGameState] = useState({
+        state: GameState.NEW,
+        players: [],
+        questionNumber: 0,
+        responses: [],
+        answeredCount: 0,
+        leaderboard: []
+    })
 
     useEffect(() => {
         socket.on('connect', () => console.log('connected to server'))
-        socket.on('screen:updatePlayers', ({ players }) => {
-            console.log(players)
-            setPlayers(players)
+        socket.on('connect_error', () => console.error('connection failed'))
+        socket.on('updateState', ({gamestate}) => {
+            console.log(gamestate)
+            if (gamestate.state != gameState.state) {
+                console.log(gamestate.state)
+                switch (gamestate.state) {
+                    case GameState.STARTING_NEXT_QUESTION:
+                        // if (!soundQ2.playing()) {
+                            playQuestion2()
+                            break
+                        // }
+                    case GameState.SHOW_RESULT:
+                        // if (soundQ2.playing()) {
+                            stopQ2()
+                        // }
+                        // if (!soundQuestionTimesUp.playing()) {
+                            playQuestionTimesUp()
+                            break
+                        // }
+                    case GameState.SHOW_LEADERBOARD:
+                        // if (!soundLeaderboard.playing()) {
+                            playLeaderboard()
+                            break
+                        // }
+                }
+            }
+            setGameState({
+                state: gamestate.state,
+                players: gamestate.players,
+                questionNumber: gamestate.questionNumber,
+                responses: gamestate.currentQuestionResponses,
+                answeredCount: gamestate.answeredCount,
+                leaderboard: gamestate.leaderboard
+            })
         })
-        socket.on('gameStarting', () => {
-            setGameState({ state: GameState.STARTING_QUIZ })
+
+        socket.on('updatePlayers', ({ players }) => {
+            setGameState((prevState) => ({
+                ...prevState, 
+                players: players
+            }))
         })
-        socket.on('startingNextQuestion', () => {
-            setGameState({ state: GameState.STARTING_NEXT_QUESTION })
-            setAnsweredCount(0)
-        })
-        socket.on('showQuestion', () => {
-            setGameState({ state: GameState.SHOW_QUESTION })
-        })
-        socket.on('showAnswers', () => {
-            setGameState({ state: GameState.SHOW_ANSWERS })
-        })
-        socket.on('showResult', ({responses: resp}) => {
-            setGameState({ state: GameState.SHOW_RESULT })
-            setResponses(resp)
-        })
-        socket.on('showLeaderboard', ({leaderboard: lb}) => {
-            setGameState({ state: GameState.SHOW_LEADERBOARD })
-            console.log(lb)
-            setLeaderboard(lb)
-        })
-        socket.on('showFinalResults', ({leaderboard: lb}) => {
-            setGameState({ state: GameState.SHOW_FINAL_RESULTS })
-            setLeaderboard(lb)
-        })
-        socket.on('updateAnsweredCount', ({answered}) => {
-            setAnsweredCount(answered)
+        socket.on('updateAnsweredCount', ({gamestate}) => {
+            setGameState({
+                state: gamestate.state,
+                players: gamestate.players,
+                questionNumber: gamestate.questionNumber,
+                responses: gamestate.currentQuestionResponses,
+                answeredCount: gamestate.answeredCount,
+                leaderboard: gamestate.leaderboard
+            })
         })
     }, [])
 
     const transitionToNextState = () => {
-        switch (gameState.state) {
-            case GameState.NEW:
-                socket.emit('startGame')
-                break;
-            case GameState.STARTING_QUIZ:
-                socket.emit('screen:startingNextQuestion')
-                break;
-            case GameState.STARTING_NEXT_QUESTION:
-                socket.emit('screen:showQuestion', {question})
-                break;
-            case GameState.SHOW_QUESTION:
-                socket.emit('screen:showAnswers')
-                break;
-            case GameState.SHOW_ANSWERS:
-                socket.emit('screen:showResult', {question})
-                break;
-            case GameState.SHOW_RESULT:
-                socket.emit('screen:showLeaderboard', {question})
-                break;
-            case GameState.SHOW_LEADERBOARD:
-                if (question < questions.length - 1) {
-                    socket.emit('screen:startingNextQuestion')
-                } else {
-                    socket.emit('screen:showFinalResults')
-                }
-                setQuestion(question + 1)
-                break;
-        }
+        socket.emit('requestNextState')
     }
 
-    const playAudio = useMemo(() => {
-        switch (gameState.state) {
-            case GameState.STARTING_NEXT_QUESTION:
-                if (!soundQ2.playing()) {
-                    playQuestion2()
-                }
-                return 
-            case GameState.SHOW_RESULT:
-                if (soundQ2.playing()) {
-                    stopQ2()
-                }
-                if (!soundQuestionTimesUp.playing()) {
-                    playQuestionTimesUp()
-                }
-                return
-            case GameState.SHOW_LEADERBOARD:
-                if (!soundLeaderboard.playing()) {
-                    playLeaderboard()
-                }
-                return
-        }
-        return
-    }, [gameState])
+    // const playAudio = useMemo(() => {
+        
+    //     return
+    // }, [gameState])
 
 
     const renderScreen = () => {
         switch (gameState.state) {
             case GameState.NEW: 
-                return <WaitingScreen players={players}/>
+                return <WaitingScreen players={gameState.players}/>
             case GameState.STARTING_QUIZ: 
                 return <StartingQuizScreen />
             case GameState.STARTING_NEXT_QUESTION:
@@ -140,22 +116,23 @@ const ScreenPage = () => {
             case GameState.SHOW_ANSWERS:
             case GameState.SHOW_RESULT: 
                 const labels = ['A', 'B', 'C', 'D']
-                const correctAns = questions[question]['answer']
+                const correctAns = questions[gameState.questionNumber]['answer']
                 labels[correctAns] += '✓'
                 return <QuestionScreen 
-                    question={questions[question]['question']}
-                    answers={questions[question]['answers']}
-                    answer={questions[question]['answer']}
-                    answeredCount={answeredCount}
+                    question={questions[gameState.questionNumber]['question']}
+                    answers={questions[gameState.questionNumber]['answers']}
+                    answer={questions[gameState.questionNumber]['answer']}
+                    answeredCount={gameState.answeredCount}
                     state={gameState.state}
                     labels={labels}
-                    responses={responses}
+                    responses={gameState.responses}
                     transitionToNextState={transitionToNextState}
                 />
                 
             case GameState.SHOW_LEADERBOARD: 
-                return <LeaderboardScreen leaderboard={leaderboard}/>
-            case GameState.SHOW_FINAL_RESULTS: return <div>Final score</div>
+                return <LeaderboardScreen leaderboard={gameState.leaderboard}/>
+            case GameState.SHOW_FINAL_RESULTS: 
+                return <FinalLeaderboardScreen leaderboard={gameState.leaderboard} />
         }
     }
 
@@ -171,7 +148,7 @@ const ScreenPage = () => {
                     </div>
                     <div className='text-center flex-1'>
                         {renderScreen()}
-                        {playAudio}
+                        {/* {playAudio} */}
                     </div>
                 </div>
                 <div className='flex flex-row-reverse'>

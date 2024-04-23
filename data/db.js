@@ -5,7 +5,7 @@ const initialiseDB = () => {
     db.exec(`
     CREATE TABLE IF NOT EXISTS players  (
         id TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
+        name TEXT UNIQUE NOT NULL,
         active INT DEFAULT 1
     );
     CREATE TABLE IF NOT EXISTS player_responses (

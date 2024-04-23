@@ -29,7 +29,7 @@ const LeaderboardScreen = ({leaderboard}) => {
                             <div className='flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
                                 <span className='text-3xl font-playfair'>#{index+1}</span>
                                 <span className='text-3xl font-playfair'>{player.name}</span>
-                                <span className='text-4xl font-playfair animate__animated animate__headShake '>{player.score}</span>
+                                <span className='text-4xl font-playfair'>{player.score}</span>
                             </div>
                         </Flipped>
                     ))}

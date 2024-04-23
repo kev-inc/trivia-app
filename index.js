@@ -4,6 +4,7 @@ const { Server } = require('socket.io');
 const { addNewPlayer, removePlayer, getPlayerList, addScoreToPlayer, getAllScoresDesc, freezeAndUpdateTop5 } = require('./data/players');
 const { getQuizResponses, addQuizResponse, getQuizTotalResponses, initialiseQuizResponses, getQuestionResponses, getTop5PlayersAndScores, addPlayerResponse, getQuestionResponsesSum, getFullLeaderboard, setQuestionStartTime } = require('./data/responses');
 const { db, initialiseDB } = require('./data/db');
+const { GameState, gamestate, handleTransitionToNextState, resetGamestate } = require('./data/gamestate');
 
 initialiseDB()
 const app = express();
@@ -18,75 +19,57 @@ app.get('/', (req, res) => {
     res.send('server is running');
 });
 
+app.get('/resetgamestate', (req, res) => {
+    resetGamestate()
+    res.send('gamestate resetted')
+})
+
 io.on('connection', (socket) => {
 
+    // When server receives 'joinGame', add the user, send back 'joinedGame' to client, broadcast 'screen:updatePlayers' to screen to refresh player count
     socket.on('joinGame', ({username}) => {
+        if (gamestate.state != GameState.NEW) {
+            socket.emit('joinGameError', ({msg: "Oops! The game has already started :("}))
+            return
+        }
         try {
             addNewPlayer(socket.id, username)
             socket.emit('joinedGame', {username})
-            io.emit('screen:updatePlayers', {players: getPlayerList()})
+            gamestate.players = getPlayerList()
+            io.emit('updatePlayers', {players: gamestate.players})
         } catch (e) {
-            socket.emit('joinGameError')
+            console.log(e)
+            socket.emit('joinGameError', {msg: "Please try again with a different name"})
         }
     })
 
+    socket.on('requestNextState', () => {
+        handleTransitionToNextState()
+        io.emit('updateState', {gamestate})
+    })
+
+    // When server receives 'startGame', broadcast 'gameStarting' to all connected devices
     socket.on('startGame', () => {
-        io.emit('gameStarting')
-    })
-    socket.on('screen:startingNextQuestion', () => {
-        io.emit('startingNextQuestion')
-    })
-    socket.on('screen:showQuestion', ({question}) => {
-        setQuestionStartTime(question, Date.now())
-        io.emit('showQuestion', {question})
-    })
-    socket.on('screen:showAnswers', () => {
-        io.emit('showAnswers')
-    })
-    socket.on('screen:showResult', ({question}) => {
-        const responses = new Map(getQuestionResponses(question).map(resp => [resp.answer_selected, resp.count]))
-        const responsesArr = [
-            responses.get(0) || 0,
-            responses.get(1) || 0,
-            responses.get(2) || 0,
-            responses.get(3) || 0,
-        ]
-        io.emit('showResult', {responses: responsesArr})
-    })
-    socket.on('screen:showLeaderboard', ({question}) => {
-        const full = getFullLeaderboard(question)
-        const prev = getTop5PlayersAndScores(question - 1)
-        const latest = getTop5PlayersAndScores(question)
-        io.emit('showLeaderboard', {leaderboard: {prev, new: latest, full}})
-    })
-    socket.on('screen:showFinalResults', () => {
-        const leaderboard = getTop5PlayersAndScores(10)
-        io.emit('showFinalResults', {leaderboard})
+        gamestate.state = GameState.STARTING_QUIZ
+        io.emit('updateState', {gamestate})
     })
 
     socket.on('userAnsweredQuestion', ({questionNo, answer, correct}) => {
         addPlayerResponse(socket.id, questionNo, answer, correct)
-        const answered = getQuestionResponsesSum(questionNo)
-        io.emit('updateAnsweredCount', {answered})
-        // if (correct) {
-        //     addScoreToPlayer(socket.id, getPlayerList().length - answered)
-        // }
+        gamestate.answeredCount = getQuestionResponsesSum(questionNo)
+        io.emit('updateAnsweredCount', {gamestate})
         socket.emit('userAnswered')
     })
 
     socket.on('disconnect', () => {
         console.log(socket.id, 'just left')
         removePlayer(socket.id)
-        // const findIndex = players.findIndex(p => p.id == socket.id)
-        // if (findIndex !== -1) {
-        //     players.splice(findIndex, 1)
-        // }
-        const players = getPlayerList()
-        io.emit('screen:updatePlayers', {players})
+        gamestate.players = getPlayerList()
+        io.emit('updateState', {gamestate})
     })
 
-    const players = getPlayerList()
-    socket.emit('screen:updatePlayers', {players})
+    gamestate.players = getPlayerList()
+    socket.emit('updateState', {gamestate})
     console.log(socket.id, 'connected');
 });
 
