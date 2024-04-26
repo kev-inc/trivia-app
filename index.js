@@ -3,7 +3,7 @@ const { createServer } = require('node:http');
 const { Server } = require('socket.io');
 const { addNewPlayer, removePlayer, getPlayerList, addScoreToPlayer, getAllScoresDesc, freezeAndUpdateTop5 } = require('./data/players');
 const { getQuizResponses, addQuizResponse, getQuizTotalResponses, initialiseQuizResponses, getQuestionResponses, getTop5PlayersAndScores, addPlayerResponse, getQuestionResponsesSum, getFullLeaderboard, setQuestionStartTime } = require('./data/responses');
-const { db, initialiseDB } = require('./data/db');
+const { db, initialiseDB, resetDB } = require('./data/db');
 const { GameState, gamestate, handleTransitionToNextState, resetGamestate } = require('./data/gamestate');
 
 initialiseDB()
@@ -65,6 +65,8 @@ io.on('connection', (socket) => {
 
     socket.on('resetgs', () => {
         resetGamestate()
+        resetDB()
+        initialiseDB()
     })
 
     gamestate.players = getPlayerList()
