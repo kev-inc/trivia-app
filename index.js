@@ -19,11 +19,6 @@ app.get('/', (req, res) => {
     res.send('server is running');
 });
 
-app.get('/resetgamestate', (req, res) => {
-    resetGamestate()
-    res.send('gamestate resetted')
-})
-
 io.on('connection', (socket) => {
 
     // When server receives 'joinGame', add the user, send back 'joinedGame' to client, broadcast 'screen:updatePlayers' to screen to refresh player count
@@ -66,6 +61,10 @@ io.on('connection', (socket) => {
         removePlayer(socket.id)
         gamestate.players = getPlayerList()
         io.emit('updatePlayers', {players: gamestate.players})
+    })
+
+    socket.on('resetgs', () => {
+        resetGamestate()
     })
 
     gamestate.players = getPlayerList()

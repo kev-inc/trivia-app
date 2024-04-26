@@ -51,7 +51,7 @@ const PlayerPage = () => {
           leaderboard: gamestate.leaderboard,
         })
         if (gamestate.state == GameState.SHOW_LEADERBOARD) {
-          const myPosition = gamestate.leaderboard.full.findIndex(l => l.name == username)
+          const myPosition = gamestate.leaderboard.full.findIndex(l => l.player_name == username)
           console.log(gameState.leaderboard)
           if (myPosition => 0) {
             setPosition(myPosition)
@@ -230,21 +230,21 @@ const PlayerPage = () => {
           { (position - 1) >= 0 &&
             <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
               <span className='text-3xl font-playfair'>#{position}</span>
-              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position-1]?.name}</span>
+              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position-1]?.player_name}</span>
               <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position-1]?.score}</span>
             </div>
           }
           {
             <div className='h-full flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
               <span className='text-3xl font-playfair'>#{position+1}</span>
-              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position]?.name}</span>
+              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position]?.player_name}</span>
               <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position]?.score}</span>
             </div>
           }
           { (position + 1) < gameState.leaderboard.full.length &&
             <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
               <span className='text-3xl font-playfair'>#{position+2}</span>
-              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position+1]?.name}</span>
+              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position+1]?.player_name}</span>
               <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position+1]?.score}</span>
             </div>
           }

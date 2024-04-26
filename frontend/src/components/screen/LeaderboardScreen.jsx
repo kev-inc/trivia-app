@@ -23,12 +23,12 @@ const LeaderboardScreen = ({leaderboard}) => {
             </div>
             
             <div className=' w-1/2 mx-auto flex flex-col gap-y-4'>
-                <Flipper flipKey={order.map(o => o.player_id).join('')} spring={{}}>
+                <Flipper flipKey={order.map(o => o.player_name).join('')} spring={{}}>
                     {order.map((player, index) => (
-                        <Flipped key={player.player_id} flipId={player.player_id}>
+                        <Flipped key={player.player_name} flipId={player.player_name}>
                             <div className='flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
                                 <span className='text-3xl font-playfair'>#{index+1}</span>
-                                <span className='text-3xl font-playfair'>{player.name}</span>
+                                <span className='text-3xl font-playfair'>{player.player_name}</span>
                                 <span className='text-4xl font-playfair'>{player.score}</span>
                             </div>
                         </Flipped>

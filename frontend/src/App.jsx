@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { GameContext, GameState } from "./context/GameContext";
 import DebugButtons from "./components/DebugButtons";
 import ScreenPage from "./pages/ScreenPage";
+import ResetPage from "./pages/ResetPage";
 
 const router = createBrowserRouter([
   {
@@ -12,6 +13,9 @@ const router = createBrowserRouter([
   }, {
     path: "/screen",
     element: <ScreenPage />,
+  }, {
+    path: "/resetgs",
+    element: <ResetPage />,
   }
 ]);
 
