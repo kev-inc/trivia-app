@@ -18,8 +18,8 @@ describe('players test', () => {
             { id: "4", name: "testplayer4" },
         ]
         const want = [
-            { id: "3", name: "testplayer3", active: 1 },
-            { id: "4", name: "testplayer4", active: 1 },
+            { id: "3", name: "testplayer3" },
+            { id: "4", name: "testplayer4" },
         ]
 
         addNewPlayer(input[0]['id'], input[0]['name'])

@@ -54,8 +54,8 @@ io.on('connection', (socket) => {
         io.emit('updateState', {gamestate})
     })
 
-    socket.on('userAnsweredQuestion', ({questionNo, answer, correct}) => {
-        addPlayerResponse(socket.id, questionNo, answer, correct)
+    socket.on('userAnsweredQuestion', ({name, questionNo, answer, correct}) => {
+        addPlayerResponse(socket.id, name, questionNo, answer, correct)
         gamestate.answeredCount = getQuestionResponsesSum(questionNo)
         io.emit('updateAnsweredCount', {gamestate})
         socket.emit('userAnswered')
@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
         console.log(socket.id, 'just left')
         removePlayer(socket.id)
         gamestate.players = getPlayerList()
-        io.emit('updateState', {gamestate})
+        io.emit('updatePlayers', {players: gamestate.players})
     })
 
     gamestate.players = getPlayerList()
