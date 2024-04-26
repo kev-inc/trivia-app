@@ -147,7 +147,7 @@ const PlayerPage = () => {
 
   const questionComponent = gameState.questionNumber < questions.length && (
     <div className='my-8 font-playfair text-xl'>
-      <div className='w-5/6 mx-auto'>{questions[gameState.questionNumber]['question']}</div>
+      <div className='w-5/6 mx-auto select-none'>{questions[gameState.questionNumber]['question']}</div>
     </div>
   )
 
@@ -261,7 +261,7 @@ const PlayerPage = () => {
 
   const submitAnswer = (answer) => {
     const correct = answer === questions[gameState.questionNumber]['answer']
-    socket.emit('userAnsweredQuestion', { questionNo: gameState.questionNumber, answer, correct })
+    socket.emit('userAnsweredQuestion', { name: gameState.name, questionNo: gameState.questionNumber, answer, correct })
   }
 
   const renderComponent = () => {

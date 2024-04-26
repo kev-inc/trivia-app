@@ -1,0 +1,10 @@
+version: "3"
+services:
+  server:
+    image: node:current-alpine
+    container_name: "server"
+    working_dir: '/opt'
+    volumes:
+      - ./:/opt
+    command: "npm start"
+  
