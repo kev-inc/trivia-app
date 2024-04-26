@@ -3,7 +3,7 @@ import qr from '../../images/qr.png'
 const WaitingScreen = ({players}) => (
     <div key={0}>
         <div className='flex justify-center'>
-            <span className='text-2xl p-4 font-playfair font-semibold tracking-wider bg-white text-black rounded mb-4'>Scan me to join, or go to https://knj-trivia.vercel.app/</span>
+            <span className='text-2xl p-4 font-playfair font-semibold tracking-wider bg-white text-black rounded mb-4'>Scan me to join, or go to https://knj-trivia.pages.dev/</span>
         </div>
         <div className='flex justify-center'>
             <img className='h-64' src={qr} alt="qr"/>
