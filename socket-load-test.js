@@ -3,12 +3,13 @@ const { GameState } = require("./data/gamestate");
 const { questionList } = require("./data/questions");
 
 const URL = process.env.URL || "http://localhost:3001";
-const MAX_CLIENTS = 100;
+const MAX_CLIENTS = 150;
 const POLLING_PERCENTAGE = 0.05;
-const CLIENT_CREATION_INTERVAL_IN_MS = 10;
+const CLIENT_CREATION_INTERVAL_IN_MS = 1000;
 const EMIT_INTERVAL_IN_MS = 1000;
 
 let clientCount = 0;
+let connectedClients = 0;
 let lastReport = new Date().getTime();
 let packetsSinceLastReport = 0;
 
@@ -22,8 +23,8 @@ const randomUser = () => {
 
 const createClient = () => {
   // for demonstration purposes, some clients stay stuck in HTTP long-polling
-  const transports =
-    Math.random() < POLLING_PERCENTAGE ? ["polling"] : ["polling", "websocket"];
+  const transports = ["websocket"]
+    // Math.random() < POLLING_PERCENTAGE ? ["polling"] : ["polling", "websocket"];
 
   const socket = io(URL, {
     transports,
@@ -31,6 +32,10 @@ const createClient = () => {
   
   let name = randomUser()
 
+  socket.on('connect', () => {
+    connectedClients++
+    console.log(connectedClients, 'clients connected')
+  })
   socket.emit('joinGame', {username: name})
 
   socket.on('joinedGame', ({username}) => {
