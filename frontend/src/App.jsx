@@ -16,6 +16,9 @@ const router = createBrowserRouter([
   }, {
     path: "/resetgs",
     element: <ResetPage />,
+  }, {
+    path: "/bgm",
+    element: <a className="underline" href="https://www.youtube.com/watch?v=Uj93hicGDNc&ab_channel=StreamCafe">Link to youtube</a>
   }
 ]);
 
