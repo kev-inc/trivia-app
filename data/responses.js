@@ -6,15 +6,23 @@ const setQuestionStartTime = (questionNum, unixtime) => {
 }
 
 const addPlayerResponse = (playerId, playerName, questionNo, answerNo, isAnswerCorrect) => {
-    const points = Math.floor((questionStartTime[questionNo] + (15 * 1000) - Date.now()) / 100)
-    const info = db.prepare('INSERT INTO player_responses (player_id, player_name, question_number, answer_selected, score) VALUES (?,?,?,?,?)')
-        .run(playerId, playerName, questionNo, answerNo, isAnswerCorrect ? points : 0)
-    // if adding a response for a player that is not in the list, create that player first, then try again
+    try {
+        const points = Math.floor((questionStartTime[questionNo] + (15 * 1000) - Date.now()) / 100)
+        const info = db.prepare('INSERT INTO player_responses (player_id, player_name, question_number, answer_selected, score) VALUES (?,?,?,?,?)')
+            .run(playerId, playerName, questionNo, answerNo, isAnswerCorrect ? points : 0)
+        // if adding a response for a player that is not in the list, create that player first, then try again
+    } catch (e) {
+        console.log('Error adding player response', e)
+    }
 }
 
 const getAllResponses = () => {
-    const rows = db.prepare('SELECT * FROM player_responses').all()
-    return rows
+    try {
+        const rows = db.prepare('SELECT * FROM player_responses').all()
+        return rows
+    } catch (e) {
+        console.log('Error getting all responses', e)
+    }
 }
 
 // const getPlayerScore = (playerName, questionNumber) => {
@@ -24,24 +32,40 @@ const getAllResponses = () => {
 // }
 
 const getQuestionResponses = (questionNumber) => {
-    const data = db.prepare('SELECT answer_selected, count(1) AS count FROM player_responses WHERE question_number = ? GROUP BY answer_selected').all(questionNumber)
-    console.log(data)
-    return data
+    try {
+        const data = db.prepare('SELECT answer_selected, count(1) AS count FROM player_responses WHERE question_number = ? GROUP BY answer_selected').all(questionNumber)
+        // console.log(data)
+        return data
+    } catch (e) {
+        console.log('Error getting question responses', e)
+    }
 }
 
 const getQuestionResponsesSum = (questionNumber) => {
-    const data = db.prepare('SELECT count(1) AS count FROM player_responses WHERE question_number = ?').get(questionNumber)
-    return data['count']
+    try {
+        const data = db.prepare('SELECT count(1) AS count FROM player_responses WHERE question_number = ?').get(questionNumber)
+        return data['count']
+    } catch (e) {
+        console.log('Error getting question responses sum', e)
+    }
 }
 
 const getFullLeaderboard = (questionNumber) => {
-    const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC').all(questionNumber)
-    return data
+    try {
+        const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC').all(questionNumber)
+        return data
+    } catch (e) {
+        console.log('Error getting full leaderboard', e)
+    }
 }
 
 const getTop5PlayersAndScores = (questionNumber) => {
-    const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC LIMIT 5').all(questionNumber)
-    return data
+    try {
+        const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC LIMIT 5').all(questionNumber)
+        return data
+    } catch (e) {
+        console.log('Error getting top 5 players and scores')
+    }
 }
 
 module.exports = {
