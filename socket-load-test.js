@@ -33,14 +33,6 @@ const createClient = () => {
 
   socket.emit('joinGame', {username: name})
 
-//   setInterval(() => {
-//     // socket.emit("client to server event");
-//     socket.emit('joinGame', { username: randomUser()})
-//   }, EMIT_INTERVAL_IN_MS);
-
-//   socket.on("server to client event", () => {
-//     packetsSinceLastReport++;
-//   });
   socket.on('joinedGame', ({username}) => {
     packetsSinceLastReport++;
   })
@@ -54,7 +46,7 @@ const createClient = () => {
       setTimeout(() => {
         const answer = randomNumber(4)
         const correct = answer === questionList[gamestate.questionNumber]['answer']
-        socket.emit('userAnsweredQuestion', { questionNo: gamestate.questionNumber, answer, correct })
+        socket.emit('userAnsweredQuestion', { name: name, questionNo: gamestate.questionNumber, answer, correct })
       }, randomNumber(10000))
     }
   })
