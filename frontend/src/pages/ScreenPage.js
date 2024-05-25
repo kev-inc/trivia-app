@@ -132,8 +132,14 @@ const ScreenPage = () => {
             case GameState.SHOW_LEADERBOARD: 
                 return <LeaderboardScreen leaderboard={gameState.leaderboard}/>
             case GameState.SHOW_FINAL_RESULTS: 
-                return <FinalLeaderboardScreen leaderboard={gameState.leaderboard} />
+                return <FinalLeaderboardScreen leaderboard={gameState.leaderboard} transitionToNextState={transitionToNextState} />
         }
+    }
+
+    const transitionButtonClick = () => {
+        if (gameState.state != GameState.SHOW_FINAL_RESULTS) {
+            transitionToNextState()
+	}
     }
 
     return (
@@ -152,7 +158,7 @@ const ScreenPage = () => {
                     </div>
                 </div>
                 <div className='flex flex-row-reverse'>
-                    <button className='bg-sky-500 hover:bg-sky-600 active:bg-sky-700 px-4 py-2' onClick={transitionToNextState}>▶</button>
+                    <button className='bg-sky-500 hover:bg-sky-600 active:bg-sky-700 px-4 py-2' onClick={transitionButtonClick}>▶</button>
                 </div>
 
             </div>

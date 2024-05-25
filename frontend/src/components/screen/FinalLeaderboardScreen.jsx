@@ -1,12 +1,15 @@
 import { useState } from "react";
 
-const FinalLeaderboardScreen = ({leaderboard}) => {
+const FinalLeaderboardScreen = ({leaderboard, transitionToNextState}) => {
 
     const [order, setOrder] = useState(leaderboard['new'])
 
     const [revealed, setRevealed] = useState(leaderboard['new'].length)
 
     const revealNext = () => {
+	if (revealed < 0) {
+            transitionToNextState()
+	}
         setRevealed((prevState) => prevState - 1)
     }
 
