@@ -7,7 +7,7 @@ const setQuestionStartTime = (questionNum, unixtime) => {
 
 const addPlayerResponse = (playerId, playerName, questionNo, answerNo, isAnswerCorrect) => {
     try {
-        const points = Math.floor((questionStartTime[questionNo] + (15 * 1000) - Date.now()) / 100)
+        const points = Math.floor((questionStartTime[questionNo] + (20 * 1000) - Date.now()) / 100)
         const info = db.prepare('INSERT INTO player_responses (player_id, player_name, question_number, answer_selected, score) VALUES (?,?,?,?,?)')
             .run(playerId, playerName, questionNo, answerNo, isAnswerCorrect ? points : 0)
         // if adding a response for a player that is not in the list, create that player first, then try again
