@@ -20,7 +20,7 @@ const AnswerCard = ({onclick, color, translucent, animated, children}) => {
         className += ' animate__animated animate__bounceIn'
     }
 
-    return <button className={`${className} w-full block border-b-8 rounded-lg p-4`} onClick={onclick}>
+    return <button className={`${className} font-playfair w-full block border-b-8 rounded-lg p-4`} onClick={onclick}>
         {children}
     </button>
     
