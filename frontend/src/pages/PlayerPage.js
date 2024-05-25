@@ -100,6 +100,10 @@ const PlayerPage = () => {
       alert('Please enter your name!')
       return 
     }
+    if(username.length > 10) {
+        alert('Please enter a shorter name')
+	return
+    }
     socket.emit('joinGame', { username })
   };
 
