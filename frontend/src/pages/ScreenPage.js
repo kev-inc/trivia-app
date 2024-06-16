@@ -150,10 +150,10 @@ const ScreenPage = () => {
             <div className='bg-slate-900/50 text-white h-full flex flex-col'>
                 <div className='h-full flex-1 flex flex-col container mx-auto max-w-6xl'>
                     <div className='text-center p-6'>
-                        <div className="text-4xl tracking-wider font-ephesis text-yellow-500">
+                        <div className="text-6xl tracking-wider font-ephesis text-yellow-500">
                             Kevin & Jewel
                         </div>
-                        <div className='text-xs tracking-wider font-playfair'>28 July 2024</div>
+                        <div className='text-2xl tracking-wider font-playfair'>28 July 2024</div>
                     </div>
                     <div className='text-center flex-1'>
                         {renderScreen()}
