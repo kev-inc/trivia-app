@@ -1,10 +1,12 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import PlayerPage from "./pages/PlayerPage";
-import { useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { GameContext, GameState } from "./context/GameContext";
 import DebugButtons from "./components/DebugButtons";
 import ScreenPage from "./pages/ScreenPage";
 import ResetPage from "./pages/ResetPage";
+import Loading from "./components/Loading";
+import { LoadingContext } from "./context/LoadingContext";
 import DebugPage from "./pages/DebugPage";
 
 const router = createBrowserRouter([
@@ -27,6 +29,9 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
+
+  const [displaySpinner, setDisplaySpinner] = useState(true)
+
   useEffect(() => {
     function handleBeforeUnload(e) {
       e.preventDefault()
@@ -37,7 +42,10 @@ function App() {
       window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [])
-  return <RouterProvider router={router} />
+  return <LoadingContext.Provider value={{displaySpinner, setDisplaySpinner}}>
+    {displaySpinner && <Loading />}
+    <RouterProvider router={router} />
+  </LoadingContext.Provider>
 }
 
 export default App;

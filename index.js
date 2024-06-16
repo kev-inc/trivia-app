@@ -67,6 +67,7 @@ io.on('connection', (socket) => {
         resetGamestate()
         resetDB()
         initialiseDB()
+        io.emit('updateState', {gamestate})
     })
 
     gamestate.players = getPlayerList()
