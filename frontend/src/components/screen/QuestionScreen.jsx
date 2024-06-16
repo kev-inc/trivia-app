@@ -16,8 +16,8 @@ const QuestionScreen = ({question, answers, answer, answeredCount, state, labels
                     </div>
                     <div className='flex-1'></div>
                     <div className='text-center'>
-                        <span className='text-4xl font-bold'>{answeredCount}</span><br />
-                        <span className='text-lg font-semibold'>Answered</span>
+                        <span className='text-4xl font-bold font-playfair'>{answeredCount}</span><br />
+                        <span className='text-lg font-semibold font-playfair'>Answered</span>
                     </div>
                 </div>
             case GameState.SHOW_RESULT: 

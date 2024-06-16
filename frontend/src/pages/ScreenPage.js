@@ -160,9 +160,9 @@ const ScreenPage = () => {
                         {/* {playAudio} */}
                     </div>
                 </div>
-                <div className='flex flex-row-reverse'>
+                {/* <div className='flex flex-row-reverse'>
                     <button className='bg-sky-500 hover:bg-sky-600 active:bg-sky-700 px-4 py-2' onClick={transitionButtonClick}>▶</button>
-                </div>
+                </div> */}
 
             </div>
 
