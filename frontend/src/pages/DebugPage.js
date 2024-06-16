@@ -17,7 +17,7 @@ const DebugPage = () => {
     }, [])
 
 	const resetgs = () => {
-		if (confirm('Are you sure you want to reset the gamestate?')) {
+		if (window.confirm('Are you sure you want to reset the gamestate?')) {
 			socket.emit('resetgs')
 		}
 	}
