@@ -33,41 +33,65 @@ const DebugPage = () => {
 		socket.emit('requestNextState')
 	}
 
+	const Section = ({ title, children }) => (
+		<div className='border rounded-lg shadow px-4 py-2 mx-2 my-4'>
+			<div className='font-bold'>{title}</div>
+			{children}
+		</div>
+	)
+
 	return (
 		<div>
-			<div>Debug Panel</div>
-			<div className='mt-4'>
-				<button onClick={resetgs} className='bg-blue-500 hover:bg-blue-600 active:bg-blue-700 px-2 py-1 rounded-lg text-white'>Reset Game</button>
-			</div>
-			<div className='mt-4'>
+			<Section title='Debug Panel'></Section>
+			<Section title=''>
 				<button onClick={transitionNextState} className='bg-blue-500 hover:bg-blue-600 active:bg-blue-700 px-4 py-2 rounded-lg text-white'>Next State</button>
-			</div>
-			<div>State: {getGameStateString(state?.state)}</div>
-			<div>Question Number: {state?.questionNumber + 1}</div>
-			<div>Answered Count: {state?.answeredCount}</div>
-			<div>Players</div>
-			{state?.players.map((player, index) => (
-				<div>{player.id} {player.name}</div>
-			))}
-			<div>Leaderboard</div>
-			<table class="table-auto">
-				<thead>
-					<tr>
-						<th className='border px-2'>#</th>
-						<th className='border px-2'>Player</th>
-						<th className='border px-2'>Score</th>
-					</tr>
-				</thead>
-				<tbody>
-					{state?.leaderboard?.full?.map((player, index) => (
-						<tr key={index}>
-							<td className='border px-2'>{index + 1}</td>
-							<td className='border px-2'>{player.player_name}</td>
-							<td className='border px-2'>{player.score}</td>
+			</Section>
+			<Section title='State'>{getGameStateString(state?.state)}</Section>
+			<Section title='Question Number'>{state?.questionNumber + 1}</Section>
+			<Section title='Answered Count'>{state?.answeredCount}</Section>
+			<Section title='Players'>
+
+				<table class="table-auto">
+					<thead>
+						<tr>
+							<th className='border px-2'>ID</th>
+							<th className='border px-2'>Player</th>
 						</tr>
-					))}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{state?.players.map((player, index) => (
+							<tr key={index}>
+								<td className='border px-2'>{player.id}</td>
+								<td className='border px-2'>{player.name}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</Section>
+			<Section title='Leaderboard'>
+				<table class="table-auto">
+					<thead>
+						<tr>
+							<th className='border px-2'>#</th>
+							<th className='border px-2'>Player</th>
+							<th className='border px-2'>Score</th>
+						</tr>
+					</thead>
+					<tbody>
+						{state?.leaderboard?.full?.map((player, index) => (
+							<tr key={index}>
+								<td className='border px-2'>{index + 1}</td>
+								<td className='border px-2'>{player.player_name}</td>
+								<td className='border px-2'>{player.score}</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</Section>
+
+			<Section title=''>
+				<button onClick={resetgs} className='bg-blue-500 hover:bg-blue-600 active:bg-blue-700 px-2 py-1 rounded-lg text-white'>Reset Game</button>
+			</Section>
 		</div>
 	)
 
