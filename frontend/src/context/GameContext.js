@@ -13,6 +13,10 @@ export const GameState = {
     SHOW_FINAL_RESULTS: 9,
 }
 
+export const getGameStateString = (state) => {
+    return Object.keys(GameState).find(key => GameState[key] === state)
+}
+
 export const GameContext = createContext({
     name: '',
     state: GameState.NEW
