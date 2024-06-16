@@ -2,10 +2,10 @@ const { io } = require("socket.io-client");
 const { GameState } = require("./data/gamestate");
 const { questionList } = require("./data/questions");
 
-const URL = process.env.URL || "http://localhost:3001";
+const URL = "http://34.142.227.87";
 const MAX_CLIENTS = 150;
 const POLLING_PERCENTAGE = 0.05;
-const CLIENT_CREATION_INTERVAL_IN_MS = 500;
+const CLIENT_CREATION_INTERVAL_IN_MS = 200;
 const EMIT_INTERVAL_IN_MS = 1000;
 
 let clientCount = 0;

@@ -20,14 +20,17 @@ import StartingQuestionScreen from "../components/screen/StartingQuestionScreen"
 import QuestionScreen from "../components/screen/QuestionScreen";
 import LeaderboardScreen from "../components/screen/LeaderboardScreen";
 import FinalLeaderboardScreen from "../components/screen/FinalLeaderboardScreen";
+import { LoadingContext } from "../context/LoadingContext";
 
 const ScreenPage = () => {
+    
+    const {displaySpinner, setDisplaySpinner} = useContext(LoadingContext)
 
-    const [playQuestionTimesUp, {sound: soundQuestionTimesUp}] = useSound(questionTimesUpSfx)
-    const [playLobby, {stop: stopLobby}] = useSound(lobbySfx)
-    const [playQuestion1, {stop: stopQuestion1}] = useSound(question1Sfx)
-    const [playQuestion2, {sound: soundQ2, stop: stopQ2}] = useSound(question2Sfx)
-    const [playLeaderboard, {sound: soundLeaderboard}] = useSound(leaderboardSfx)
+    // const [playQuestionTimesUp, {sound: soundQuestionTimesUp}] = useSound(questionTimesUpSfx)
+    // const [playLobby, {stop: stopLobby}] = useSound(lobbySfx)
+    // const [playQuestion1, {stop: stopQuestion1}] = useSound(question1Sfx)
+    // const [playQuestion2, {sound: soundQ2, stop: stopQ2}] = useSound(question2Sfx)
+    // const [playLeaderboard, {sound: soundLeaderboard}] = useSound(leaderboardSfx)
 
     const [gameState, setGameState] = useState({
         state: GameState.NEW,
@@ -39,32 +42,32 @@ const ScreenPage = () => {
     })
 
     useEffect(() => {
-        socket.on('connect', () => console.log('connected to server'))
+        socket.on('connect', () => setDisplaySpinner(false))
         socket.on('connect_error', () => console.error('connection failed'))
         socket.on('updateState', ({gamestate}) => {
             console.log(gamestate)
             if (gamestate.state != gameState.state) {
                 console.log(gamestate.state)
-                switch (gamestate.state) {
-                    case GameState.STARTING_NEXT_QUESTION:
-                        // if (!soundQ2.playing()) {
-                            playQuestion2()
-                            break
-                        // }
-                    case GameState.SHOW_RESULT:
-                        // if (soundQ2.playing()) {
-                            stopQ2()
-                        // }
-                        // if (!soundQuestionTimesUp.playing()) {
-                            playQuestionTimesUp()
-                            break
-                        // }
-                    case GameState.SHOW_LEADERBOARD:
-                        // if (!soundLeaderboard.playing()) {
-                            playLeaderboard()
-                            break
-                        // }
-                }
+                // switch (gamestate.state) {
+                //     case GameState.STARTING_NEXT_QUESTION:
+                //         // if (!soundQ2.playing()) {
+                //             playQuestion2()
+                //             break
+                //         // }
+                //     case GameState.SHOW_RESULT:
+                //         // if (soundQ2.playing()) {
+                //             stopQ2()
+                //         // }
+                //         // if (!soundQuestionTimesUp.playing()) {
+                //             playQuestionTimesUp()
+                //             break
+                //         // }
+                //     case GameState.SHOW_LEADERBOARD:
+                //         // if (!soundLeaderboard.playing()) {
+                //             playLeaderboard()
+                //             break
+                //         // }
+                // }
             }
             setGameState({
                 state: gamestate.state,

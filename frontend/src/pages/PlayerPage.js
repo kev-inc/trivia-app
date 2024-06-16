@@ -4,10 +4,13 @@ import { socket } from "../socket/socket";
 import background from '../images/bg-screen1.JPG'
 import AnswerCard from "../components/AnswerCard";
 import { questions } from "../data/questions";
+import { LoadingContext } from "../context/LoadingContext";
 
 const nth = (n) => {return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
 
 const PlayerPage = () => {
+
+  const {displaySpinner, setDisplaySpinner} = useContext(LoadingContext)
 
   const [gameState, setGameState] = useState({
     state: GameState.NEW,
@@ -21,19 +24,13 @@ const PlayerPage = () => {
   // const [questionNo, setQuestionNo] = useState(0)
 
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('connected to server')
-      // const username = localStorage.getItem('name')
-      // if (username == null) return
-      // socket.emit('joinGame', { username })
-    })
+    socket.on('connect', () => setDisplaySpinner(false))
     socket.on('connect_error', () => console.error('connection failed'))
     // socket.on('message', value => console.log(value))
 
     socket.on('joinGameError', ({msg}) => {
       alert(msg)
     })
-    
 
     socket.on('joinedGame', ({ username }) => {
       
