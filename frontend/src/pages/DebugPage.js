@@ -9,11 +9,17 @@ const DebugPage = () => {
     const [state, setState] = useState()
 
     useEffect(() => {
-	socket.on('connect', () => setDisplaySpinner(false))
-	socket.on('updateState', ({gamestate}) => {
-		console.log(gamestate)
-	    setState(gamestate)
-	})
+		socket.on('connect', () => setDisplaySpinner(false))
+		socket.on('updateState', ({gamestate}) => {
+			console.log(gamestate)
+			setState(gamestate)
+		})
+		socket.on('updatePlayers', ({ players }) => {
+			setState((prevState) => ({
+				...prevState,
+				players
+			}))
+		})
     }, [])
 
 	const resetgs = () => {

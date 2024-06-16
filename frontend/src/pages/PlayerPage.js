@@ -6,11 +6,11 @@ import AnswerCard from "../components/AnswerCard";
 import { questions } from "../data/questions";
 import { LoadingContext } from "../context/LoadingContext";
 
-const nth = (n) => {return["st","nd","rd"][((n+90)%100-10)%10-1]||"th"}
+const nth = (n) => { return ["st", "nd", "rd"][((n + 90) % 100 - 10) % 10 - 1] || "th" }
 
 const PlayerPage = () => {
 
-  const {displaySpinner, setDisplaySpinner} = useContext(LoadingContext)
+  const { displaySpinner, setDisplaySpinner } = useContext(LoadingContext)
 
   const [gameState, setGameState] = useState({
     state: GameState.NEW,
@@ -28,22 +28,24 @@ const PlayerPage = () => {
     socket.on('connect_error', () => console.error('connection failed'))
     // socket.on('message', value => console.log(value))
 
-    socket.on('joinGameError', ({msg}) => {
+    socket.on('joinGameError', ({ msg }) => {
+      setDisplaySpinner(false)
       alert(msg)
     })
 
     socket.on('joinedGame', ({ username }) => {
-      
+      setDisplaySpinner(false)
+
       setGameState((prevState) => ({ ...prevState, state: GameState.WAITING, name: username }))
-      
-      socket.on('updateState', ({gamestate}) => {
+
+      socket.on('updateState', ({ gamestate }) => {
         if (gamestate.state == GameState.STARTING_NEXT_QUESTION) {
           setAnswered(false)
         }
-        
+
         setGameState({
           state: gamestate.state,
-          name: username, 
+          name: username,
           questionNumber: gamestate.questionNumber,
           leaderboard: gamestate.leaderboard,
         })
@@ -57,7 +59,7 @@ const PlayerPage = () => {
       })
 
       socket.on('userAnswered', () => {
-        setGameState(prevState => ({...prevState, state: GameState.ANSWERED}))
+        setGameState(prevState => ({ ...prevState, state: GameState.ANSWERED }))
       })
 
       // socket.on('gameStarting', () => {
@@ -73,7 +75,7 @@ const PlayerPage = () => {
       // socket.on('showAnswers', () => {
       //   setGameState({ state: GameState.SHOW_ANSWERS, name: username })
       // })
-      
+
       // socket.on('showResult', () => {
       //   setGameState({ state: GameState.SHOW_RESULT, name: username })
       // })
@@ -93,14 +95,15 @@ const PlayerPage = () => {
   const joinGame = (e) => {
     e.preventDefault();
     const username = e.target.name.value
-    if(username == '') {
+    if (username == '') {
       alert('Please enter your name!')
-      return 
+      return
     }
-    if(username.length > 10) {
-        alert('Please enter a shorter name')
-	return
+    if (username.length > 10) {
+      alert('Please enter a shorter name')
+      return
     }
+    setDisplaySpinner(true)
     socket.emit('joinGame', { username })
   };
 
@@ -152,25 +155,25 @@ const PlayerPage = () => {
     </div>
   )
 
-  const answersComponent = gameState.questionNumber < questions.length &&  (
+  const answersComponent = gameState.questionNumber < questions.length && (
     <div>
       {questionComponent}
       <div className=' w-full grid grid-cols-1 text-white gap-4 text-3xl p-8 font-semibold'>
         <AnswerCard onclick={() => submitAnswer(0)} color='red' animated centered>
-            <span className='mr-2'>A.</span>
-            {questions[gameState.questionNumber]['answers'][0]}
+          <span className='mr-2'>A.</span>
+          {questions[gameState.questionNumber]['answers'][0]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(1)} color='blue' animated centered>
-            <span className='mr-2'>B.</span>
-            {questions[gameState.questionNumber]['answers'][1]}
+          <span className='mr-2'>B.</span>
+          {questions[gameState.questionNumber]['answers'][1]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(2)} color='green' animated centered>
-            <span className='mr-2'>C.</span>
-            {questions[gameState.questionNumber]['answers'][2]}
+          <span className='mr-2'>C.</span>
+          {questions[gameState.questionNumber]['answers'][2]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(3)} color='yellow' animated centered>
-            <span className='mr-2'>D.</span>
-            {questions[gameState.questionNumber]['answers'][3]}
+          <span className='mr-2'>D.</span>
+          {questions[gameState.questionNumber]['answers'][3]}
         </AnswerCard>
       </div>
     </div>
@@ -182,39 +185,39 @@ const PlayerPage = () => {
     </div>
   )
 
-  const showCorrectAnswerComponent = gameState.questionNumber < questions.length &&  (
+  const showCorrectAnswerComponent = gameState.questionNumber < questions.length && (
     <div className='my-8 '>
       <div className='w-5/6 mx-auto font-playfair text-xl font-bold'>The answer is...</div>
       <div className='text-3xl p-8 font-semibold'>
         {
           questions[gameState.questionNumber]['answer'] == 0 && (
             <AnswerCard color='red' animated centered>
-                <span className='mr-2'>A.</span>
-                {questions[gameState.questionNumber]['answers'][0]}
+              <span className='mr-2'>A.</span>
+              {questions[gameState.questionNumber]['answers'][0]}
             </AnswerCard>
           )
         }
         {
           questions[gameState.questionNumber]['answer'] == 1 && (
             <AnswerCard color='blue' animated centered>
-                <span className='mr-2'>B.</span>
-                {questions[gameState.questionNumber]['answers'][1]}
+              <span className='mr-2'>B.</span>
+              {questions[gameState.questionNumber]['answers'][1]}
             </AnswerCard>
           )
         }
         {
           questions[gameState.questionNumber]['answer'] == 2 && (
             <AnswerCard color='green' animated centered>
-                <span className='mr-2'>C.</span>
-                {questions[gameState.questionNumber]['answers'][2]}
+              <span className='mr-2'>C.</span>
+              {questions[gameState.questionNumber]['answers'][2]}
             </AnswerCard>
           )
         }
         {
           questions[gameState.questionNumber]['answer'] == 3 && (
             <AnswerCard color='yellow' animated centered>
-                <span className='mr-2'>D.</span>
-                {questions[gameState.questionNumber]['answers'][3]}
+              <span className='mr-2'>D.</span>
+              {questions[gameState.questionNumber]['answers'][3]}
             </AnswerCard>
           )
         }
@@ -228,25 +231,25 @@ const PlayerPage = () => {
 
       <div className='flex flex-col justify-center items-center h-full mt-3'>
         <div className='w-full px-4 h-full flex flex-col gap-y-4'>
-          { (position - 1) >= 0 &&
+          {(position - 1) >= 0 &&
             <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
               <span className='text-3xl font-playfair'>#{position}</span>
-              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position-1]?.player_name}</span>
-              <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position-1]?.score}</span>
+              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position - 1]?.player_name}</span>
+              <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position - 1]?.score}</span>
             </div>
           }
           {
             <div className='h-full flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
-              <span className='text-3xl font-playfair'>#{position+1}</span>
+              <span className='text-3xl font-playfair'>#{position + 1}</span>
               <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position]?.player_name}</span>
               <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position]?.score}</span>
             </div>
           }
-          { (position + 1) < gameState.leaderboard.full.length &&
+          {(position + 1) < gameState.leaderboard.full.length &&
             <div className='h-full opacity-20 flex mb-3 justify-between items-center px-8 py-2 border-grey bg-white text-black rounded border-4'>
-              <span className='text-3xl font-playfair'>#{position+2}</span>
-              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position+1]?.player_name}</span>
-              <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position+1]?.score}</span>
+              <span className='text-3xl font-playfair'>#{position + 2}</span>
+              <span className='text-3xl font-playfair'>{gameState.leaderboard.full[position + 1]?.player_name}</span>
+              <span className='text-4xl font-playfair'>{gameState.leaderboard.full[position + 1]?.score}</span>
             </div>
           }
         </div>
@@ -277,7 +280,7 @@ const PlayerPage = () => {
       case GameState.SHOW_RESULT: return showCorrectAnswerComponent;
       case GameState.SHOW_LEADERBOARD: return showCurrentPositionComponent;
       case GameState.SHOW_FINAL_RESULTS: return finalLeaderboardComponent
- 
+
       default: return <span>{gameState.name} {gameState.state}</span>
     }
   }

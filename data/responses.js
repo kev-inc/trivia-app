@@ -52,7 +52,12 @@ const getQuestionResponsesSum = (questionNumber) => {
 
 const getFullLeaderboard = (questionNumber) => {
     try {
-        const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC').all(questionNumber)
+        const data = db.prepare(`
+            WITH leaderboard AS (
+                SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name
+            ) 
+            SELECT name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC;
+        `).all(questionNumber)
         return data
     } catch (e) {
         console.log('Error getting full leaderboard', e)
@@ -61,7 +66,12 @@ const getFullLeaderboard = (questionNumber) => {
 
 const getTop5PlayersAndScores = (questionNumber) => {
     try {
-        const data = db.prepare('SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name ORDER BY score DESC LIMIT 5').all(questionNumber)
+        const data = db.prepare(`
+            WITH leaderboard AS (
+                SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name
+            ) 
+            SELECT name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC LIMIT 5;
+        `).all(questionNumber)
         return data
     } catch (e) {
         console.log('Error getting top 5 players and scores')
