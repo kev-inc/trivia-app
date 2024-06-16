@@ -56,7 +56,7 @@ const getFullLeaderboard = (questionNumber) => {
             WITH leaderboard AS (
                 SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name
             ) 
-            SELECT player_name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC;
+            SELECT name as player_name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC;
         `).all(questionNumber)
         return data
     } catch (e) {
@@ -70,7 +70,7 @@ const getTop5PlayersAndScores = (questionNumber) => {
             WITH leaderboard AS (
                 SELECT player_name, SUM(score) AS score FROM player_responses WHERE question_number <= ? GROUP BY player_name
             ) 
-            SELECT player_name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC LIMIT 5;
+            SELECT name as player_name, IFNULL(score, 0)as score from players LEFT JOIN leaderboard on name = player_name ORDER BY score DESC LIMIT 5;
         `).all(questionNumber)
         return data
     } catch (e) {
