@@ -47,7 +47,7 @@ const createClient = () => {
   })
 
   socket.on('updateState', ({gamestate}) => {
-    if (gamestate.state == GameState.SHOW_ANSWERS) {
+    if (gamestate.state == GameState.SHOW_QUESTION_OPTIONS) {
       setTimeout(() => {
         const answer = randomNumber(4)
         const correct = answer === questionList[gamestate.questionNumber]['answer']

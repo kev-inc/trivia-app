@@ -248,9 +248,9 @@ const PlayerPage = () => {
       case GameState.STARTING_QUIZ: return startingComponent;
       case GameState.STARTING_NEXT_QUESTION: return nextQuestionComponent;
       case GameState.SHOW_QUESTION: return questionComponent;
-      case GameState.SHOW_ANSWERS: return answersComponent;
+      case GameState.SHOW_QUESTION_OPTIONS: return answersComponent;
       case GameState.ANSWERED: return answerSubmittedComponent;
-      case GameState.SHOW_RESULT: return showCorrectAnswerComponent;
+      case GameState.SHOW_CORRECT_ANSWER: return showCorrectAnswerComponent;
       case GameState.SHOW_LEADERBOARD: return showCurrentPositionComponent;
       case GameState.SHOW_FINAL_RESULTS_SHOW_0: 
       case GameState.SHOW_FINAL_RESULTS_SHOW_1: 

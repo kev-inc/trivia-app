@@ -55,7 +55,7 @@ const ScreenPage = () => {
                 //             playQuestion2()
                 //             break
                 //         // }
-                //     case GameState.SHOW_RESULT:
+                //     case GameState.SHOW_CORRECT_ANSWER:
                 //         // if (soundQ2.playing()) {
                 //             stopQ2()
                 //         // }
@@ -117,8 +117,8 @@ const ScreenPage = () => {
             case GameState.STARTING_NEXT_QUESTION:
                 return <StartingQuestionScreen transitionToNextState={transitionToNextState} />
             case GameState.SHOW_QUESTION: 
-            case GameState.SHOW_ANSWERS:
-            case GameState.SHOW_RESULT: 
+            case GameState.SHOW_QUESTION_OPTIONS:
+            case GameState.SHOW_CORRECT_ANSWER: 
                 const labels = ['A', 'B', 'C', 'D']
                 const correctAns = questionList[gameState.questionNumber]['answer']
                 labels[correctAns] += '✓'

@@ -9,7 +9,7 @@ const QuestionScreen = ({question, answers, answer, answeredCount, state, labels
     const renderMidSection = () => {
         switch(state) {
             case GameState.SHOW_QUESTION: return
-            case GameState.SHOW_ANSWERS: 
+            case GameState.SHOW_QUESTION_OPTIONS: 
                 return <div key={1} className='flex flex-1 w-full p-8 animate__animated animate__fadeIn'>
                     <div>
                         <CountdownTimer onComplete={transitionToNextState} duration={16} type='sm'/>
@@ -20,7 +20,7 @@ const QuestionScreen = ({question, answers, answer, answeredCount, state, labels
                         <span className='text-lg font-semibold font-playfair'>Answered</span>
                     </div>
                 </div>
-            case GameState.SHOW_RESULT: 
+            case GameState.SHOW_CORRECT_ANSWER: 
                 return <div key={2} className='flex flex-col flex-1 w-full p-8 animate__animated animate__fadeIn'>
                     <div className='flex-1'>
                     <ResultsChart labels={labels} responses={responses}/>
@@ -41,7 +41,7 @@ const QuestionScreen = ({question, answers, answer, answeredCount, state, labels
         switch(state) {
             case GameState.SHOW_QUESTION:
                 return <CountdownTimer onComplete={transitionToNextState} duration={3}/>
-            case GameState.SHOW_ANSWERS:
+            case GameState.SHOW_QUESTION_OPTIONS:
                 return <div className=' w-full grid grid-cols-2 gap-4 text-3xl p-8 font-semibold text-left'>
                     <AnswerCard color='red' animated>
                         <span className='mr-2'>A.</span>
@@ -60,7 +60,7 @@ const QuestionScreen = ({question, answers, answer, answeredCount, state, labels
                         {answers[3]}
                     </AnswerCard>
                 </div>
-            case GameState.SHOW_RESULT:
+            case GameState.SHOW_CORRECT_ANSWER:
                 return <div className=' w-full grid grid-cols-2 gap-4 text-3xl p-8 font-semibold text-left'>
                     <AnswerCard color='red' translucent={answer !== 0}>
                         <span className='mr-2'>A.</span>
