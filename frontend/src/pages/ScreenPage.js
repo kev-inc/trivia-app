@@ -2,7 +2,7 @@ import { useContext, useEffect, useMemo, useState } from "react"
 import { socket } from "../socket/socket"
 import useSound from 'use-sound';
 import { GameContext, GameState } from "../context/GameContext"
-import { questions } from "../data/questions"
+import { questionList } from "../data/questions"
 import background from '../images/bg-screen1.JPG'
 import CountdownTimer from "../components/CountdownTimer"
 
@@ -120,12 +120,12 @@ const ScreenPage = () => {
             case GameState.SHOW_ANSWERS:
             case GameState.SHOW_RESULT: 
                 const labels = ['A', 'B', 'C', 'D']
-                const correctAns = questions[gameState.questionNumber]['answer']
+                const correctAns = questionList[gameState.questionNumber]['answer']
                 labels[correctAns] += '✓'
                 return <QuestionScreen 
-                    question={questions[gameState.questionNumber]['question']}
-                    answers={questions[gameState.questionNumber]['answers']}
-                    answer={questions[gameState.questionNumber]['answer']}
+                    question={questionList[gameState.questionNumber]['question']}
+                    answers={questionList[gameState.questionNumber]['answers']}
+                    answer={questionList[gameState.questionNumber]['answer']}
                     answeredCount={gameState.answeredCount}
                     state={gameState.state}
                     labels={labels}
