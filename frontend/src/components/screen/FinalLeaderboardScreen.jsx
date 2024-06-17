@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GameState } from "../../context/GameContext";
 
 const FinalLeaderboardScreen = ({leaderboard, state, transitionToNextState}) => {
 
