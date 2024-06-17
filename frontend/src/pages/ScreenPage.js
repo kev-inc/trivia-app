@@ -21,6 +21,7 @@ import QuestionScreen from "../components/screen/QuestionScreen";
 import LeaderboardScreen from "../components/screen/LeaderboardScreen";
 import FinalLeaderboardScreen from "../components/screen/FinalLeaderboardScreen";
 import { LoadingContext } from "../context/LoadingContext";
+import SOCKET_MESSAGES from "../data/constants";
 
 const ScreenPage = () => {
     
@@ -42,9 +43,9 @@ const ScreenPage = () => {
     })
 
     useEffect(() => {
-        socket.on('connect', () => setDisplaySpinner(false))
-        socket.on('connect_error', () => console.error('connection failed'))
-        socket.on('updateState', ({gamestate}) => {
+        socket.on(SOCKET_MESSAGES.S2C.CONNECT, () => setDisplaySpinner(false))
+        socket.on(SOCKET_MESSAGES.S2C.CONNECTION_ERROR, () => console.error('connection failed'))
+        socket.on(SOCKET_MESSAGES.S2C.UPDATE_STATE, ({gamestate}) => {
             console.log(gamestate)
             if (gamestate.state != gameState.state) {
                 console.log(gamestate.state)
@@ -79,13 +80,13 @@ const ScreenPage = () => {
             })
         })
 
-        socket.on('updatePlayers', ({ players }) => {
+        socket.on(SOCKET_MESSAGES.S2C.UPDATE_PLAYERS, ({ players }) => {
             setGameState((prevState) => ({
                 ...prevState, 
                 players: players
             }))
         })
-        socket.on('updateAnsweredCount', ({gamestate}) => {
+        socket.on(SOCKET_MESSAGES.S2C.UPDATE_ANSWERED_COUNT, ({gamestate}) => {
             setGameState({
                 state: gamestate.state,
                 players: gamestate.players,
@@ -98,7 +99,7 @@ const ScreenPage = () => {
     }, [])
 
     const transitionToNextState = () => {
-        socket.emit('requestNextState')
+        socket.emit(SOCKET_MESSAGES.C2S.REQUEST_NEXT_STATE)
     }
 
     // const playAudio = useMemo(() => {
@@ -134,15 +135,12 @@ const ScreenPage = () => {
                 
             case GameState.SHOW_LEADERBOARD: 
                 return <LeaderboardScreen leaderboard={gameState.leaderboard}/>
-            case GameState.SHOW_FINAL_RESULTS: 
-                return <FinalLeaderboardScreen leaderboard={gameState.leaderboard} transitionToNextState={transitionToNextState} />
+            case GameState.SHOW_FINAL_RESULTS_SHOW_0: 
+            case GameState.SHOW_FINAL_RESULTS_SHOW_1: 
+            case GameState.SHOW_FINAL_RESULTS_SHOW_2: 
+            case GameState.SHOW_FINAL_RESULTS_SHOW_3: 
+                return <FinalLeaderboardScreen leaderboard={gameState.leaderboard} state={gameState.state} transitionToNextState={transitionToNextState} />
         }
-    }
-
-    const transitionButtonClick = () => {
-        if (gameState.state != GameState.SHOW_FINAL_RESULTS) {
-            transitionToNextState()
-	}
     }
 
     return (

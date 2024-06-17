@@ -10,7 +10,10 @@ export const GameState = {
     ANSWERED: 6, // For lobby, when player has submitted an answer
     SHOW_RESULT: 7, // For lobby and screen, stop accepting answers, show the correct answer, and answer breakdown
     SHOW_LEADERBOARD: 8, // For screen, show top 5, for lobby, show current position
-    SHOW_FINAL_RESULTS: 9,
+    SHOW_FINAL_RESULTS_SHOW_0: 9, // Show none
+    SHOW_FINAL_RESULTS_SHOW_1: 10, // Show 3rd
+    SHOW_FINAL_RESULTS_SHOW_2: 11, // Show 2nd
+    SHOW_FINAL_RESULTS_SHOW_3: 12, // Show 1st
 }
 
 export const getGameStateString = (state) => {

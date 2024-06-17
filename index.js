@@ -5,6 +5,7 @@ const { addNewPlayer, removePlayer, getPlayerList, addScoreToPlayer, getAllScore
 const { getQuizResponses, addQuizResponse, getQuizTotalResponses, initialiseQuizResponses, getQuestionResponses, getTop5PlayersAndScores, addPlayerResponse, getQuestionResponsesSum, getFullLeaderboard, setQuestionStartTime } = require('./data/responses');
 const { db, initialiseDB, resetDB } = require('./data/db');
 const { GameState, gamestate, handleTransitionToNextState, resetGamestate } = require('./data/gamestate');
+const SOCKET_MESSAGES = require('./data/constants');
 
 initialiseDB()
 const app = express();
@@ -22,56 +23,50 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
 
     // When server receives 'joinGame', add the user, send back 'joinedGame' to client, broadcast 'screen:updatePlayers' to screen to refresh player count
-    socket.on('joinGame', ({username}) => {
+    socket.on(SOCKET_MESSAGES.C2S.JOIN_GAME, ({username}) => {
         if (gamestate.state != GameState.NEW) {
-            socket.emit('joinGameError', ({msg: "Oops! The game has already started :("}))
+            socket.emit(SOCKET_MESSAGES.S2C.JOIN_GAME_ERROR, ({msg: "Oops! The game has already started :("}))
             return
         }
         try {
             addNewPlayer(socket.id, username)
-            socket.emit('joinedGame', {username})
+            socket.emit(SOCKET_MESSAGES.S2C.JOINED_GAME, {username})
             gamestate.players = getPlayerList()
-            io.emit('updatePlayers', {players: gamestate.players})
+            io.emit(SOCKET_MESSAGES.S2C.UPDATE_PLAYERS, {players: gamestate.players})
         } catch (e) {
             console.log(e)
-            socket.emit('joinGameError', {msg: "Please try again with a different name"})
+            socket.emit(SOCKET_MESSAGES.S2C.JOIN_GAME_ERROR, {msg: "Please try again with a different name"})
         }
     })
 
-    socket.on('requestNextState', () => {
+    socket.on(SOCKET_MESSAGES.C2S.REQUEST_NEXT_STATE, () => {
         handleTransitionToNextState()
-        io.emit('updateState', {gamestate})
+        io.emit(SOCKET_MESSAGES.S2C.UPDATE_STATE, {gamestate})
     })
 
-    // When server receives 'startGame', broadcast 'gameStarting' to all connected devices
-    socket.on('startGame', () => {
-        gamestate.state = GameState.STARTING_QUIZ
-        io.emit('updateState', {gamestate})
-    })
-
-    socket.on('userAnsweredQuestion', ({name, questionNo, answer, correct}) => {
+    socket.on(SOCKET_MESSAGES.C2S.USER_ANSWERED_QUESTION, ({name, questionNo, answer, correct}) => {
         addPlayerResponse(socket.id, name, questionNo, answer, correct)
         gamestate.answeredCount = getQuestionResponsesSum(questionNo)
-        io.emit('updateAnsweredCount', {gamestate})
-        socket.emit('userAnswered')
+        io.emit(SOCKET_MESSAGES.S2C.UPDATE_ANSWERED_COUNT, {gamestate})
+        socket.emit(SOCKET_MESSAGES.S2C.USER_ANSWERED)
     })
 
-    socket.on('disconnect', () => {
+    socket.on(SOCKET_MESSAGES.C2S.DISCONNECT, () => {
         console.log(socket.id, 'just left')
         removePlayer(socket.id)
         gamestate.players = getPlayerList()
-        io.emit('updatePlayers', {players: gamestate.players})
+        io.emit(SOCKET_MESSAGES.S2C.UPDATE_PLAYERS, {players: gamestate.players})
     })
 
-    socket.on('resetgs', () => {
+    socket.on(SOCKET_MESSAGES.C2S.RESET_GS, () => {
         resetGamestate()
         resetDB()
         initialiseDB()
-        io.emit('updateState', {gamestate})
+        io.emit(SOCKET_MESSAGES.S2C.UPDATE_STATE, {gamestate})
     })
 
     gamestate.players = getPlayerList()
-    socket.emit('updateState', {gamestate})
+    socket.emit(SOCKET_MESSAGES.S2C.UPDATE_STATE, {gamestate})
     console.log(socket.id, 'connected');
 });
 

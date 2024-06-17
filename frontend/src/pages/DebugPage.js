@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react'
 import { socket } from '../socket/socket'
 import { LoadingContext } from '../context/LoadingContext'
 import { getGameStateString } from '../context/GameContext'
+import SOCKET_MESSAGES from '../data/constants'
 
 const DebugPage = () => {
 
@@ -10,12 +11,12 @@ const DebugPage = () => {
 	const [state, setState] = useState()
 
 	useEffect(() => {
-		socket.on('connect', () => setDisplaySpinner(false))
-		socket.on('updateState', ({ gamestate }) => {
+		socket.on(SOCKET_MESSAGES.S2C.CONNECT, () => setDisplaySpinner(false))
+		socket.on(SOCKET_MESSAGES.S2C.UPDATE_STATE, ({ gamestate }) => {
 			console.log(gamestate)
 			setState(gamestate)
 		})
-		socket.on('updatePlayers', ({ players }) => {
+		socket.on(SOCKET_MESSAGES.S2C.UPDATE_PLAYERS, ({ players }) => {
 			setState((prevState) => ({
 				...prevState,
 				players
@@ -25,12 +26,12 @@ const DebugPage = () => {
 
 	const resetgs = () => {
 		if (window.confirm('Are you sure you want to reset the gamestate?')) {
-			socket.emit('resetgs')
+			socket.emit(SOCKET_MESSAGES.C2S.RESET_GS)
 		}
 	}
 
 	const transitionNextState = () => {
-		socket.emit('requestNextState')
+		socket.emit(SOCKET_MESSAGES.C2S.REQUEST_NEXT_STATE)
 	}
 
 	const Section = ({ title, children }) => (

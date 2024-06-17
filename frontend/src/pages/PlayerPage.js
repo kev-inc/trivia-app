@@ -3,8 +3,9 @@ import { GameContext, GameState } from "../context/GameContext";
 import { socket } from "../socket/socket";
 import background from '../images/bg-screen1.JPG'
 import AnswerCard from "../components/AnswerCard";
-import { questions } from "../data/questions";
+import { questionList } from "../data/questions";
 import { LoadingContext } from "../context/LoadingContext";
+import SOCKET_MESSAGES from "../data/constants";
 
 const nth = (n) => { return ["st", "nd", "rd"][((n + 90) % 100 - 10) % 10 - 1] || "th" }
 
@@ -24,21 +25,21 @@ const PlayerPage = () => {
   // const [questionNo, setQuestionNo] = useState(0)
 
   useEffect(() => {
-    socket.on('connect', () => setDisplaySpinner(false))
-    socket.on('connect_error', () => console.error('connection failed'))
+    socket.on(SOCKET_MESSAGES.S2C.CONNECT, () => setDisplaySpinner(false))
+    socket.on(SOCKET_MESSAGES.S2C.CONNECTION_ERROR, () => console.error('connection failed'))
     // socket.on('message', value => console.log(value))
 
-    socket.on('joinGameError', ({ msg }) => {
+    socket.on(SOCKET_MESSAGES.S2C.JOIN_GAME_ERROR, ({ msg }) => {
       setDisplaySpinner(false)
       alert(msg)
     })
 
-    socket.on('joinedGame', ({ username }) => {
+    socket.on(SOCKET_MESSAGES.S2C.JOINED_GAME, ({ username }) => {
       setDisplaySpinner(false)
 
       setGameState((prevState) => ({ ...prevState, state: GameState.WAITING, name: username }))
 
-      socket.on('updateState', ({ gamestate }) => {
+      socket.on(SOCKET_MESSAGES.S2C.UPDATE_STATE, ({ gamestate }) => {
         if (gamestate.state == GameState.STARTING_NEXT_QUESTION) {
           setAnswered(false)
         }
@@ -58,37 +59,9 @@ const PlayerPage = () => {
         }
       })
 
-      socket.on('userAnswered', () => {
+      socket.on(SOCKET_MESSAGES.S2C.USER_ANSWERED, () => {
         setGameState(prevState => ({ ...prevState, state: GameState.ANSWERED }))
       })
-
-      // socket.on('gameStarting', () => {
-      //   setGameState({ state: GameState.STARTING_QUIZ, name: username })
-      // })
-      // socket.on('startingNextQuestion', () => {
-      //   setGameState({ state: GameState.STARTING_NEXT_QUESTION, name: username })
-      // })
-      // socket.on('showQuestion', ({ question }) => {
-      //   setGameState({ state: GameState.SHOW_QUESTION, name: username })
-      //   setQuestionNo(question)
-      // })
-      // socket.on('showAnswers', () => {
-      //   setGameState({ state: GameState.SHOW_ANSWERS, name: username })
-      // })
-
-      // socket.on('showResult', () => {
-      //   setGameState({ state: GameState.SHOW_RESULT, name: username })
-      // })
-      // socket.on('showLeaderboard', ({leaderboard: lb}) => {
-      //   const myPosition = lb['full'].findIndex(l => l.player_id == socket.id)
-      //   console.log(lb, socket.id, myPosition)
-      //   if (myPosition => 0) {
-      //     setGameState({ state: GameState.SHOW_LEADERBOARD, name: username, position: myPosition, full: lb['full'] })
-      //   }
-      // })
-      // socket.on('showFinalResults', () => {
-      //   setGameState({ state: GameState.SHOW_FINAL_RESULTS, name: username })
-      // })
     })
 
   }, [])
@@ -104,7 +77,7 @@ const PlayerPage = () => {
       return
     }
     setDisplaySpinner(true)
-    socket.emit('joinGame', { username })
+    socket.emit(SOCKET_MESSAGES.C2S.JOIN_GAME, { username })
   };
 
   const welcomeComponent = (
@@ -149,31 +122,31 @@ const PlayerPage = () => {
     </div>
   )
 
-  const questionComponent = gameState.questionNumber < questions.length && (
+  const questionComponent = gameState.questionNumber < questionList.length && (
     <div className='my-8 font-playfair text-xl'>
-      <div className='w-5/6 mx-auto select-none'>{questions[gameState.questionNumber]['question']}</div>
+      <div className='w-5/6 mx-auto select-none'>{questionList[gameState.questionNumber]['question']}</div>
     </div>
   )
 
-  const answersComponent = gameState.questionNumber < questions.length && (
+  const answersComponent = gameState.questionNumber < questionList.length && (
     <div>
       {questionComponent}
       <div className=' w-full grid grid-cols-1 text-white gap-4 text-3xl p-8 font-semibold'>
         <AnswerCard onclick={() => submitAnswer(0)} color='red' animated centered>
           <span className='mr-2'>A.</span>
-          {questions[gameState.questionNumber]['answers'][0]}
+          {questionList[gameState.questionNumber]['answers'][0]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(1)} color='blue' animated centered>
           <span className='mr-2'>B.</span>
-          {questions[gameState.questionNumber]['answers'][1]}
+          {questionList[gameState.questionNumber]['answers'][1]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(2)} color='green' animated centered>
           <span className='mr-2'>C.</span>
-          {questions[gameState.questionNumber]['answers'][2]}
+          {questionList[gameState.questionNumber]['answers'][2]}
         </AnswerCard>
         <AnswerCard onclick={() => submitAnswer(3)} color='yellow' animated centered>
           <span className='mr-2'>D.</span>
-          {questions[gameState.questionNumber]['answers'][3]}
+          {questionList[gameState.questionNumber]['answers'][3]}
         </AnswerCard>
       </div>
     </div>
@@ -185,39 +158,39 @@ const PlayerPage = () => {
     </div>
   )
 
-  const showCorrectAnswerComponent = gameState.questionNumber < questions.length && (
+  const showCorrectAnswerComponent = gameState.questionNumber <questionList.length && (
     <div className='my-8 '>
       <div className='w-5/6 mx-auto font-playfair text-xl font-bold'>The answer is...</div>
       <div className='text-3xl p-8 font-semibold'>
         {
-          questions[gameState.questionNumber]['answer'] == 0 && (
+          questionList[gameState.questionNumber]['answer'] == 0 && (
             <AnswerCard color='red' animated centered>
               <span className='mr-2'>A.</span>
-              {questions[gameState.questionNumber]['answers'][0]}
+              {questionList[gameState.questionNumber]['answers'][0]}
             </AnswerCard>
           )
         }
         {
-          questions[gameState.questionNumber]['answer'] == 1 && (
+          questionList[gameState.questionNumber]['answer'] == 1 && (
             <AnswerCard color='blue' animated centered>
               <span className='mr-2'>B.</span>
-              {questions[gameState.questionNumber]['answers'][1]}
+              {questionList[gameState.questionNumber]['answers'][1]}
             </AnswerCard>
           )
         }
         {
-          questions[gameState.questionNumber]['answer'] == 2 && (
+          questionList[gameState.questionNumber]['answer'] == 2 && (
             <AnswerCard color='green' animated centered>
               <span className='mr-2'>C.</span>
-              {questions[gameState.questionNumber]['answers'][2]}
+              {questionList[gameState.questionNumber]['answers'][2]}
             </AnswerCard>
           )
         }
         {
-          questions[gameState.questionNumber]['answer'] == 3 && (
+          questionList[gameState.questionNumber]['answer'] == 3 && (
             <AnswerCard color='yellow' animated centered>
               <span className='mr-2'>D.</span>
-              {questions[gameState.questionNumber]['answers'][3]}
+              {questionList[gameState.questionNumber]['answers'][3]}
             </AnswerCard>
           )
         }
@@ -264,7 +237,7 @@ const PlayerPage = () => {
   )
 
   const submitAnswer = (answer) => {
-    const correct = answer === questions[gameState.questionNumber]['answer']
+    const correct = answer === questionList[gameState.questionNumber]['answer']
     socket.emit('userAnsweredQuestion', { name: gameState.name, questionNo: gameState.questionNumber, answer, correct })
   }
 
@@ -279,8 +252,11 @@ const PlayerPage = () => {
       case GameState.ANSWERED: return answerSubmittedComponent;
       case GameState.SHOW_RESULT: return showCorrectAnswerComponent;
       case GameState.SHOW_LEADERBOARD: return showCurrentPositionComponent;
-      case GameState.SHOW_FINAL_RESULTS: return finalLeaderboardComponent
-
+      case GameState.SHOW_FINAL_RESULTS_SHOW_0: 
+      case GameState.SHOW_FINAL_RESULTS_SHOW_1: 
+      case GameState.SHOW_FINAL_RESULTS_SHOW_2: 
+      case GameState.SHOW_FINAL_RESULTS_SHOW_3: 
+        return finalLeaderboardComponent
       default: return <span>{gameState.name} {gameState.state}</span>
     }
   }
