@@ -3,7 +3,7 @@ const { GameState } = require("./data/gamestate");
 const { questionList } = require("./data/questions");
 
 const URL = "http://34.142.227.87";
-const MAX_CLIENTS = 150;
+const MAX_CLIENTS = 100;
 const POLLING_PERCENTAGE = 0.05;
 const CLIENT_CREATION_INTERVAL_IN_MS = 200;
 const EMIT_INTERVAL_IN_MS = 1000;

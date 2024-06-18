@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import { socket } from '../socket/socket'
 import { LoadingContext } from '../context/LoadingContext'
-import { getGameStateString } from '../context/GameContext'
+import { GameState, getGameStateString } from '../context/GameContext'
 import SOCKET_MESSAGES from '../data/constants'
 
 const DebugPage = () => {
@@ -47,10 +47,14 @@ const DebugPage = () => {
 			<Section title=''>
 				<button onClick={transitionNextState} className='bg-blue-500 hover:bg-blue-600 active:bg-blue-700 px-4 py-2 rounded-lg text-white'>Next State</button>
 			</Section>
-			<Section title='State'>{getGameStateString(state?.state)}</Section>
+			<Section title='State'>
+				{Object.keys(GameState).map(s => (
+					<div className={s === getGameStateString(state?.state) ? 'font-bold' : ''}>{s === getGameStateString(state?.state) ? '>' : ''} {s}</div>
+				))}
+			</Section>
 			<Section title='Question Number'>{state?.questionNumber + 1}</Section>
 			<Section title='Answered Count'>{state?.answeredCount}</Section>
-			<Section title='Players'>
+			<Section title={`Players (${state?.players.length})`}>
 
 				<table class="table-auto">
 					<thead>
@@ -69,7 +73,7 @@ const DebugPage = () => {
 					</tbody>
 				</table>
 			</Section>
-			<Section title='Leaderboard'>
+			<Section title={`Leaderboard`}>
 				<table class="table-auto">
 					<thead>
 						<tr>
