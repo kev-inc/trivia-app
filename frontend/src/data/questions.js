@@ -35,11 +35,6 @@ const questionList = [
 	answers: ['London', 'Paris', 'Switzerland', 'New Zealand'],
 	answer: 3
 },
-{
-	question: '8. What is Kevin & Jewel going to do tomorrow?',
-	answers: ['Watch the Olympics', 'Watch a Marvel movie', 'Count angpows', 'Relax'],
-	answer: 3
-},
 
 ]
 
