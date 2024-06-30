@@ -17,11 +17,11 @@ const CountdownTimer = ({duration, type = 'lg', onComplete }) => {
         colors={'#fff'}
         // colorsTime={[3, 2, 1, 0]}
         trailStrokeWidth={0}
-        strokeWidth={8}
+        strokeWidth={16}
         onComplete={onComplete}
-        size={60}
+        size={160}
     >
-        {({ remainingTime }) => <span className='font-semibold text-xl'>{remainingTime}</span>}
+        {({ remainingTime }) => <span className='font-semibold text-6xl'>{remainingTime}</span>}
     </CountdownCircleTimer>
     const hidden = <CountdownCircleTimer
         isPlaying

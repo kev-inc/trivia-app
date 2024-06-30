@@ -146,7 +146,7 @@ const ScreenPage = () => {
     return (
         <div style={{ backgroundImage: `url(${background})` }} className='h-screen bg-cover bg-center'>
             <div className='bg-slate-900/50 text-white h-full flex flex-col'>
-                <div className='h-full flex-1 flex flex-col container mx-auto max-w-6xl'>
+                <div className='h-full flex-1 flex flex-col '>
                     <div className='text-center p-6'>
                         <div className="text-6xl tracking-wider font-ephesis text-yellow-500">
                             Kevin & Jewel

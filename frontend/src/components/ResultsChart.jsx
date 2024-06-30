@@ -32,7 +32,7 @@ const ResultsChart = ({ labels, responses }) => {
             datalabels: {
                 font: {
                     weight: 'bold',
-                    size: 24,
+                    size: 48,
                 },
                 color: 'white',
             }
@@ -57,7 +57,7 @@ const ResultsChart = ({ labels, responses }) => {
         },
         layout: {
             padding: {
-                top: 32
+                top: 64
             }
         }
     };

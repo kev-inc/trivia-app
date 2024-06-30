@@ -11,7 +11,7 @@ const questionList = [
 	answer: 3
 },
 {
-	question: "3. What has Kevin & Jewel's NOT done as a date before?",
+	question: "3. What has Kevin & Jewel NOT done as a date before?",
 	answers: ['Pottery Workshop', 'Cafe hopping', 'Kayaking', 'Trampoline Park'],
 	answer: 0
 },
