@@ -25,12 +25,6 @@ const getPlayerList = () => {
     }
 }
 
-const transferPlayersToResponses = () => {
-    try {
-        const stmt = ''
-        const info = db.prepare(stmt)
-    }
-}
 
 
 module.exports = {

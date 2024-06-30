@@ -3,10 +3,10 @@ import qr from '../../images/qr.png'
 const WaitingScreen = ({players}) => (
     <div key={0}>
         <div className='my-6'>
-            <span className='text-4xl p-4 font-playfair font-bold tracking-wider bg-white text-black rounded'>Scan to join, or go to</span>
+            <span className='text-4xl p-4 font-playfair tracking-wider bg-white text-black rounded'>Scan to join, or go to</span>
         </div>
         <div className='my-6'>
-            <span className='text-4xl p-4 font-playfair font-bold tracking-wider bg-white text-black rounded'>https://wedding.kevincxy.com/</span>
+            <span className='text-4xl p-4 font-playfair font-bold tracking-wider bg-white text-black rounded'>wedding.kevincxy.com</span>
         </div>
         <div className='flex justify-center'>
             <img className='h-80' src={qr} alt="qr"/>
