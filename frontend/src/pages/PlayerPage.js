@@ -42,6 +42,7 @@ const PlayerPage = () => {
       socket.on(SOCKET_MESSAGES.S2C.UPDATE_STATE, ({ gamestate }) => {
         if (gamestate.state == GameState.STARTING_NEXT_QUESTION) {
           setAnswered(false)
+          setDisplaySpinner(false)
         }
 
         setGameState({
@@ -239,6 +240,7 @@ const PlayerPage = () => {
   const submitAnswer = (answer) => {
     const correct = answer === questionList[gameState.questionNumber]['answer']
     socket.emit('userAnsweredQuestion', { name: gameState.name, questionNo: gameState.questionNumber, answer, correct })
+    setDisplaySpinner(true)
   }
 
   const renderComponent = () => {
@@ -249,7 +251,9 @@ const PlayerPage = () => {
       case GameState.STARTING_NEXT_QUESTION: return nextQuestionComponent;
       case GameState.SHOW_QUESTION: return questionComponent;
       case GameState.SHOW_QUESTION_OPTIONS: return answersComponent;
-      case GameState.ANSWERED: return answerSubmittedComponent;
+      case GameState.ANSWERED: 
+        setDisplaySpinner(false)
+        return answerSubmittedComponent;
       case GameState.SHOW_CORRECT_ANSWER: return showCorrectAnswerComponent;
       case GameState.SHOW_LEADERBOARD: return showCurrentPositionComponent;
       case GameState.SHOW_FINAL_RESULTS_SHOW_0: 
