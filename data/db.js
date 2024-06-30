@@ -4,10 +4,6 @@ const db = new Database(':memory:', { verbose: console.log });
 const initialiseDB = () => {
     try {
         db.exec(`
-            CREATE TABLE IF NOT EXISTS players  (
-                id TEXT PRIMARY KEY,
-                name TEXT UNIQUE NOT NULL
-            );
             CREATE TABLE IF NOT EXISTS player_responses (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 player_id TEXT NOT NULL,
@@ -26,7 +22,6 @@ const resetDB = () => {
     try {
         db.exec(`
             DROP TABLE player_responses;
-            DROP TABLE players;
         `)
     } catch (e) {
         console.log('Error resetting DB:', e)
